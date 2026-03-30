@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "753842349493",
+    "project_id": "islamiclifestyle-dbc70",
+    "storage_bucket": "islamiclifestyle-dbc70.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:753842349493:android:d46c91a1c69a1a5f2e25fc",
+        "android_client_info": {
+          "package_name": "com.example.islamic_lifestyle"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "753842349493-5m7f37r9nioccti5d729vbchrn7v8o65.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBI8KQn7_u7SBwDfw2hUwb0MAHRFW_-Op8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "753842349493-5m7f37r9nioccti5d729vbchrn7v8o65.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "753842349493-767ovj65atlmq74dotvqj4vfopj5ivmc.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.islamicLifestyle"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

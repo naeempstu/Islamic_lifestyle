@@ -1,0 +1,47 @@
+{
+  "stress": [
+    {
+      "key": "dua-stress-01",
+      "titleEn": "When worry feels heavy",
+      "titleBn": "চিন্তা ভারী লাগলে",
+      "arabic": "لَا إِلٰهَ إِلَّا اللَّهُ الْعَظِيمُ الْحَلِيمُ، لَا إِلٰهَ إِلَّا اللَّهُ رَبُّ الْعَرْشِ الْعَظِيمِ، لَا إِلٰهَ إِلَّا اللَّهُ رَبُّ السَّمَاوَاتِ وَرَبُّ الْأَرْضِ وَرَبُّ كُلِّ شَيْءٍ",
+      "transliterationEn": "La ilaha illa Allahul-Azeemul-Haleem, la ilaha illa Allah Rabbul-‘Arshil-‘Azeem, la ilaha illa Allah Rabbus-Samawati wa Rabbul-Ardi wa Rabbukulli shay'",
+      "en": "There is no god but Allah, the Magnificent, the Forbearing…",
+      "bn": "আল্লাহ ছাড়া কোনো ইলাহ নেই—পরম মহান, সহনশীল…"
+    }
+  ],
+  "illness": [
+    {
+      "key": "dua-illness-01",
+      "titleEn": "Healing from Allah",
+      "titleBn": "আল্লাহর কাছে আরোগ্য চাইলে",
+      "arabic": "اللَّهُمَّ اشْفِهِ شِفَاءً تَامًّا",
+      "transliterationEn": "Allahumma ishfih shifa'an tamm(a).",
+      "en": "O Allah, grant him/her complete healing.",
+      "bn": "হে আল্লাহ, তাকে সম্পূর্ণ আরোগ্য দান করুন।"
+    }
+  ],
+  "travel": [
+    {
+      "key": "dua-travel-01",
+      "titleEn": "For safe travel",
+      "titleBn": "সফরের নিরাপত্তার জন্য",
+      "arabic": "سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَٰذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ",
+      "transliterationEn": "Subhanalladhi sakhkhara lana hadha wa ma kunna lahu muqrinina.",
+      "en": "Glory be to the One who subjected this to us, and we were not capable of it.",
+      "bn": "পবিত্র সেই সত্তা, যিনি আমাদের জন্য এটি নিয়োজিত করেছেন; আমরা এর ক্ষমতাবান ছিলাম না।"
+    }
+  ],
+  "sleep": [
+    {
+      "key": "dua-sleep-01",
+      "titleEn": "Before sleep",
+      "titleBn": "ঘুমের আগে",
+      "arabic": "بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا",
+      "transliterationEn": "Bismika Allahumma amootu wa ahya.",
+      "en": "In Your name, O Allah, I die and I live.",
+      "bn": "হে আল্লাহ, আপনার নামে আমি মৃত্যুবরণ করি এবং জীবিত হই।"
+    }
+  ]
+}
+

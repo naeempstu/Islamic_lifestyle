@@ -1,0 +1,46 @@
+{
+  "meta": {
+    "sample": true,
+    "note": "This is a lightweight offline sample dataset for development. Replace with full Quran dataset for production."
+  },
+  "surahs": [
+    {
+      "id": 1,
+      "nameEn": "Al-Fatiha",
+      "nameBn": "আল-ফাতিহা",
+      "ayahs": [
+        {
+          "number": 1,
+          "arabic": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+          "en": "In the name of Allah, the Most Compassionate, Most Merciful.",
+          "bn": "আল্লাহর নামে, যিনি পরম করুণাময়, অসীম দয়ালু।"
+        },
+        {
+          "number": 2,
+          "arabic": "الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ",
+          "en": "All praise is for Allah—Lord of all worlds.",
+          "bn": "সমস্ত প্রশংসা আল্লাহর জন্য, যিনি সৃষ্টিজগতের প্রতিপালক।"
+        },
+        {
+          "number": 3,
+          "arabic": "الرَّحْمَٰنِ الرَّحِيمِ",
+          "en": "The Most Compassionate, Most Merciful.",
+          "bn": "যিনি পরম করুণাময়, অসীম দয়ালু।"
+        },
+        {
+          "number": 4,
+          "arabic": "مَالِكِ يَوْمِ الدِّينِ",
+          "en": "Master of the Day of Judgment.",
+          "bn": "বিচার দিবসের মালিক।"
+        },
+        {
+          "number": 5,
+          "arabic": "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ",
+          "en": "You alone we worship, and You alone we ask for help.",
+          "bn": "আমরা শুধু তোমারই ইবাদত করি এবং শুধু তোমারই সাহায্য চাই।"
+        }
+      ]
+    }
+  ]
+}
+
