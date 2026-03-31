@@ -66,5 +66,11 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>আমরা আপনার অবস্থান ম্যাপে প্রদর্শন করতে প্রয়োজন</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>আমরা আপনার অবস্থান ম্যাপে প্রদর্শন করতে প্রয়োজন</string>
+	<key>google_maps_api_key</key>
+	<string>YOUR_GOOGLE_MAPS_API_KEY_HERE</string>
 </dict>
 </plist>

@@ -32,16 +32,25 @@ class _QuranReaderScreenState extends State<QuranReaderScreen> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<QuranData>(
-      future: widget.quranRepository.loadOfflineData(),
+      future: widget.quranRepository.loadQuranData(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData) {
+        if (!snapshot.hasError && !snapshot.hasData) {
           return const Center(child: CircularProgressIndicator());
+        }
+        if (snapshot.hasError) {
+          return Center(
+            child: Text(
+              widget.language == AppLanguage.bn
+                  ? 'কুরআন ডেটা লোড হতে ব্যর্থ: ${snapshot.error}'
+                  : 'Failed to load Quran data: ${snapshot.error}',
+            ),
+          );
         }
         final data = snapshot.data!;
         final today = DateTime.now();
 
-        return FutureBuilder<QuranAyah>(
-          future: widget.quranRepository.getAyahOfDay(data: data, date: today),
+        return FutureBuilder<QuranAyah?>(
+          future: _safeGetAyahOfDay(data, today),
           builder: (context, ayahSnapshot) {
             final ayahOfDay = ayahSnapshot.data;
             final query = _searchCtrl.text.trim().toLowerCase();
@@ -62,7 +71,7 @@ class _QuranReaderScreenState extends State<QuranReaderScreen> {
                 Row(
                   children: [
                     Text(
-                      'Qur’an',
+                      widget.language == AppLanguage.bn ? 'কুরআন' : "Qur'an",
                       style: Theme.of(context).textTheme.headlineMedium
                           ?.copyWith(fontWeight: FontWeight.w800),
                     ),
@@ -131,26 +140,54 @@ class _QuranReaderScreenState extends State<QuranReaderScreen> {
                     padding: const EdgeInsets.only(top: 20),
                     child: Text(
                       widget.language == AppLanguage.bn
-                          ? 'কোনো ফলাফল পাওয়া যায়নি'
-                          : 'No results found',
+                          ? 'কোনো সুরা পাওয়া যায়নি'
+                          : 'No surah found',
                       textAlign: TextAlign.center,
                     ),
                   ),
-                for (final surah in activeList)
-                  _SurahCard(
-                    language: widget.language,
-                    surah: surah,
-                    bookmarked: _bookmarkedSurahIds.contains(surah.id),
-                    onBookmarkToggle: () {
-                      setState(() {
-                        if (_bookmarkedSurahIds.contains(surah.id)) {
-                          _bookmarkedSurahIds.remove(surah.id);
-                        } else {
-                          _bookmarkedSurahIds.add(surah.id);
-                        }
-                      });
+                if (activeList.isNotEmpty)
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final width = constraints.maxWidth;
+                      const spacing = 12.0;
+                      const maxTileWidth = 90.0;
+                      final crossAxisCount = (width / (maxTileWidth + spacing))
+                          .floor()
+                          .clamp(3, 6);
+                      final tileWidth =
+                          (width - spacing * (crossAxisCount - 1)) /
+                          crossAxisCount;
+                      const tileHeight = 90.0;
+                      final ratio = tileWidth / tileHeight;
+                      return GridView.count(
+                        crossAxisCount: crossAxisCount,
+                        crossAxisSpacing: spacing,
+                        mainAxisSpacing: spacing,
+                        childAspectRatio: ratio,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        children: [
+                          for (final surah in activeList)
+                            _SurahGridItem(
+                              language: widget.language,
+                              surah: surah,
+                              bookmarked: _bookmarkedSurahIds.contains(
+                                surah.id,
+                              ),
+                              onBookmarkToggle: () {
+                                setState(() {
+                                  if (_bookmarkedSurahIds.contains(surah.id)) {
+                                    _bookmarkedSurahIds.remove(surah.id);
+                                  } else {
+                                    _bookmarkedSurahIds.add(surah.id);
+                                  }
+                                });
+                              },
+                              onTap: () => _openSurahSheet(surah),
+                            ),
+                        ],
+                      );
                     },
-                    onTap: () => _openSurahSheet(surah),
                   ),
               ],
             );
@@ -189,6 +226,14 @@ class _QuranReaderScreenState extends State<QuranReaderScreen> {
     );
   }
 
+  Future<QuranAyah?> _safeGetAyahOfDay(QuranData data, DateTime date) async {
+    try {
+      return await widget.quranRepository.getAyahOfDay(data: data, date: date);
+    } catch (_) {
+      return null;
+    }
+  }
+
   Future<void> _openSurahSheet(QuranSurah surah) async {
     await showModalBottomSheet<void>(
       context: context,
@@ -215,8 +260,8 @@ class _QuranReaderScreenState extends State<QuranReaderScreen> {
                 const SizedBox(height: 4),
                 Text(
                   widget.language == AppLanguage.bn
-                      ? '${surah.ayahs.length} আয়াত'
-                      : '${surah.ayahs.length} ayahs',
+                      ? '${surah.ayahCount ?? surah.ayahs.length} আয়াত'
+                      : '${surah.ayahCount ?? surah.ayahs.length} verses',
                 ),
                 const SizedBox(height: 12),
                 for (final ayah in surah.ayahs)
@@ -312,14 +357,14 @@ class _AyahOfDayCard extends StatelessWidget {
   }
 }
 
-class _SurahCard extends StatelessWidget {
+class _SurahGridItem extends StatelessWidget {
   final AppLanguage language;
   final QuranSurah surah;
   final bool bookmarked;
   final VoidCallback onBookmarkToggle;
   final VoidCallback onTap;
 
-  const _SurahCard({
+  const _SurahGridItem({
     required this.language,
     required this.surah,
     required this.bookmarked,
@@ -329,59 +374,73 @@ class _SurahCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return GestureDetector(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
       child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF1E8C58).withValues(alpha: 0.08),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
-        child: Row(
+        child: Stack(
           children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: const Color(0xFFE3ECE6),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Center(
-                child: Text(
-                  '${surah.id}',
-                  style: const TextStyle(
-                    color: Color(0xFF1E8C58),
-                    fontWeight: FontWeight.w800,
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE3ECE6),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Center(
+                    child: Text(
+                      '${surah.id}',
+                      style: const TextStyle(
+                        color: Color(0xFF1E8C58),
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
+                const SizedBox(height: 6),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Text(
                     language == AppLanguage.bn ? surah.nameBn : surah.nameEn,
-                    style: const TextStyle(fontWeight: FontWeight.w700),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 11,
+                    ),
                   ),
-                  Text(
-                    language == AppLanguage.bn
-                        ? '${surah.ayahs.length} আয়াত'
-                        : '${surah.ayahs.length} verses',
-                    style: const TextStyle(color: Color(0xFF7A7B89)),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-            IconButton(
-              onPressed: onBookmarkToggle,
-              icon: Icon(
-                bookmarked
-                    ? Icons.bookmark_rounded
-                    : Icons.bookmark_border_rounded,
+            Positioned(
+              top: 4,
+              right: 4,
+              child: GestureDetector(
+                onTap: onBookmarkToggle,
+                child: Icon(
+                  bookmarked
+                      ? Icons.bookmark_rounded
+                      : Icons.bookmark_border_rounded,
+                  size: 16,
+                  color: bookmarked
+                      ? const Color(0xFF1E8C58)
+                      : const Color(0xFF8E8F9A),
+                ),
               ),
             ),
           ],

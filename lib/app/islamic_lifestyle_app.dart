@@ -11,6 +11,7 @@ import '../features/dhikr/data/dhikr_repository.dart';
 import '../features/duas/data/duas_repository.dart';
 import '../features/prayer/services/prayer_times_service.dart';
 import '../features/quran/data/quran_repository.dart';
+import '../features/hadith/data/hadith_repository.dart';
 import '../features/routine/data/daily_routine_store.dart';
 import '../features/onboarding/screens/onboarding_screen.dart';
 import 'main_shell.dart';
@@ -103,6 +104,7 @@ class _IslamicLifestyleAppState extends State<IslamicLifestyleApp> {
               quranRepository: QuranRepository(),
               dhikrRepository: DhikrRepository(),
               duasRepository: DuasRepository(),
+              hadithRepository: HadithRepository(),
             )
           : OnboardingScreen(
               prefs: _prefs!,

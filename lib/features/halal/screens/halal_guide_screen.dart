@@ -16,55 +16,221 @@ class HalalGuideScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          _SectionCard(
-            title: language == AppLanguage.bn ? 'খাবার: সহজ গাইড' : 'Food: a simple guide',
-            items: [
+          // Meat & Poultry
+          _CategoryCard(
+            title: language == AppLanguage.bn ? '📌 মাংস ও পোল্ট্রি' : '📌 Meat & Poultry',
+            halalItems: [
               language == AppLanguage.bn
-                  ? 'প্রস্তুত খাবারের ক্ষেত্রে লেবেল/উৎস দেখুন।'
-                  : 'For packaged food, check labeling and trusted sources.',
+                  ? '✅ গরু, মেষ, ছাগল (বিসমিল্লাহ দিয়ে জবাই করা)'
+                  : '✅ Beef, lamb, goat (slaughtered with Bismillah)',
               language == AppLanguage.bn
-                  ? 'যদি নিশ্চিত না হন, পরিষ্কার তথ্যসহ বিকল্প বেছে নিন।'
-                  : 'If unsure, choose an option with clear, trusted information.',
+                  ? '✅ মুরগি, হাঁস, টার্কি'
+                  : '✅ Chicken, duck, turkey',
               language == AppLanguage.bn
-                  ? 'বিতর্কে যাবেন না—সহজ ও গ্রহণযোগ্য রুটিনে থাকুন।'
-                  : 'Avoid complexity. Stay with practical, mainstream steps.',
+                  ? '✅ হালাল-প্রত্যয়িত মাংস'
+                  : '✅ Halal-certified meat',
+            ],
+            haramItems: [
+              language == AppLanguage.bn
+                  ? '❌ শুকর ও শুকর পণ্য'
+                  : '❌ Pork and pork products',
+              language == AppLanguage.bn
+                  ? '❌ বিসমিল্লাহ ছাড়া জবাই করা'
+                  : '❌ Meat not slaughtered Islamically',
+              language == AppLanguage.bn
+                  ? '❌ নন-হালাল প্রত্যয়িত মাংস'
+                  : '❌ Non-halal certified meat',
             ],
           ),
           const SizedBox(height: 12),
-          _SectionCard(
-            title: language == AppLanguage.bn ? 'ই-নাম্বার (E-numbers)' : 'E-numbers (common additives)',
-            items: [
+          // Seafood
+          _CategoryCard(
+            title: language == AppLanguage.bn ? '🐟 সামুদ্রিক খাবার' : '🐟 Seafood',
+            halalItems: [
               language == AppLanguage.bn
-                  ? 'E-numbers খাদ্য সংযোজক বোঝায়। আসল হালাল/হারাম নির্ভর করে উপাদানের উৎসের উপর।'
-                  : 'E-numbers describe additives, but halal/haram depends on the source.',
+                  ? '✅ মাছ, চিংড়ি, কাঁকড়া'
+                  : '✅ Fish, shrimp, crab',
               language == AppLanguage.bn
-                  ? 'অ্যাপ্লিকেশন/পোর্টাল থেকে “উৎস-ভিত্তিক” তথ্য দেখে সিদ্ধান্ত নিন।'
-                  : 'Use source-based information before deciding.',
+                  ? '✅ ঝিনুক, শামুক'
+                  : '✅ Oysters, clams',
+            ],
+            haramItems: [],
+          ),
+          const SizedBox(height: 12),
+          // Ingredients & Additives
+          _CategoryCard(
+            title: language == AppLanguage.bn ? '🍶 উপাদান ও এডিটিভ' : '🍶 Ingredients & Additives',
+            halalItems: [
               language == AppLanguage.bn
-                  ? 'আপনার স্থানীয় স্কলার/বিশ্বস্ত গাইডলাইন ফলো করুন।'
-                  : 'Follow your trusted local guidance.',
+                  ? '✅ উদ্ভিজ তেল, প্রাকৃতিক মশলা'
+                  : '✅ Vegetable oils, natural spices',
+              language == AppLanguage.bn
+                  ? '✅ প্রাকৃতিক রং ও সংরক্ষক'
+                  : '✅ Natural colors and preservatives',
+            ],
+            haramItems: [
+              language == AppLanguage.bn
+                  ? '❌ অ্যালকোহল (ওয়াইন, বিয়ার)'
+                  : '❌ Alcohol (wine, beer)',
+              language == AppLanguage.bn
+                  ? '❌ শুকর-ভিত্তিক পণ্য'
+                  : '❌ Pork-derived products',
             ],
           ),
           const SizedBox(height: 12),
+          // Beverages
+          _CategoryCard(
+            title: language == AppLanguage.bn ? '☕ পানীয়' : '☕ Beverages',
+            halalItems: [
+              language == AppLanguage.bn
+                  ? '✅ পানি, দুধ, রস (অ্যালকোহল মুক্ত)'
+                  : '✅ Water, milk, juice (alcohol-free)',
+              language == AppLanguage.bn
+                  ? '✅ চা, কফি'
+                  : '✅ Tea, coffee',
+            ],
+            haramItems: [
+              language == AppLanguage.bn
+                  ? '❌ অ্যালকোহলযুক্ত পানীয়'
+                  : '❌ Alcoholic beverages',
+              language == AppLanguage.bn
+                  ? '❌ মাদক দ্রব্য'
+                  : '❌ Intoxicating drinks',
+            ],
+          ),
+          const SizedBox(height: 12),
+          // Dairy
+          _CategoryCard(
+            title: language == AppLanguage.bn ? '🧀 দুগ্ধজাত পণ্য' : '🧀 Dairy Products',
+            halalItems: [
+              language == AppLanguage.bn
+                  ? '✅ দুধ, দই, পনির (নিরাপদ রেনেট)'
+                  : '✅ Milk, yogurt, cheese (safe rennet)',
+              language == AppLanguage.bn
+                  ? '✅ মাখন, ঘি (হালাল উৎস)'
+                  : '✅ Butter, ghee (halal source)',
+            ],
+            haramItems: [
+              language == AppLanguage.bn
+                  ? '❌ রেনেট (অ-হালাল প্রাণী থেকে)'
+                  : '❌ Rennet from non-halal animals',
+            ],
+          ),
+          const SizedBox(height: 20),
           _SectionCard(
-            title: language == AppLanguage.bn ? 'ফাইন্যান্স: সহজ মূলনীতি' : 'Finance: gentle basics',
+            title: language == AppLanguage.bn ? 'সাধারণ দিকনির্দেশনা' : 'General Guidance',
             items: [
               language == AppLanguage.bn
-                  ? 'ব্যবহারযোগ্য, সুদের (riba) সাথে সম্পর্কিত জিনিস এড়িয়ে চলার চেষ্টা করুন।'
-                  : 'Try to avoid riba-related arrangements and interest-based products.',
+                  ? '📖 উৎস চেক করুন: পণ্যের লেবেল পড়ুন।'
+                  : '📖 Check source: Read product labels carefully.',
               language == AppLanguage.bn
-                  ? 'স্বচ্ছতা ও ন্যায়পরায়ণতা বজায় রাখুন।'
-                  : 'Choose clarity, fairness, and trust in transactions.',
+                  ? '🏷️ হালাল সার্টিফিকেশন খুঁজুন।'
+                  : '🏷️ Look for halal certification seals.',
+              language == AppLanguage.bn
+                  ? '⚖️ স্থানীয় নির্দেশনা অনুসরণ করুন।'
+                  : '⚖️ Follow guidance from local scholars.',
             ],
           ),
           const SizedBox(height: 20),
           Text(
             language == AppLanguage.bn
-                ? 'নোট: এটি মূলত “স্কলার-নিউট্রাল, মেইনস্ট্রিম” গাইড। জটিল ফিকহ বিতর্ক এখানে নেই।'
-                : 'Note: Scholar-neutral, mainstream guidance. No complex fiqh debates here.',
-            style: Theme.of(context).textTheme.bodySmall,
+                ? 'নোট: এটি একটি প্রাথমিক গাইড। বিস্তারিত ফিকহ বিষয়ে স্থানীয় ইমাম সাথে পরামর্শ করুন।'
+                : 'Note: This is basic guidance. For detailed fiqh issues, consult your local imam.',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Colors.grey[700],
+                  fontStyle: FontStyle.italic,
+                ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _CategoryCard extends StatefulWidget {
+  final String title;
+  final List<String> halalItems;
+  final List<String> haramItems;
+
+  const _CategoryCard({
+    required this.title,
+    required this.halalItems,
+    required this.haramItems,
+  });
+
+  @override
+  State<_CategoryCard> createState() => _CategoryCardState();
+}
+
+class _CategoryCardState extends State<_CategoryCard> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 0,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            GestureDetector(
+              onTap: () => setState(() => _expanded = !_expanded),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      widget.title,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                  Icon(_expanded ? Icons.expand_less : Icons.expand_more),
+                ],
+              ),
+            ),
+            if (_expanded) ...[
+              const SizedBox(height: 12),
+              if (widget.halalItems.isNotEmpty) ...[
+                Text(
+                  'Halal (Permissible):',
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        color: const Color(0xFF2E7D32),
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                const SizedBox(height: 8),
+                for (final item in widget.halalItems)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 6),
+                    child: Text(
+                      item,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ),
+                if (widget.haramItems.isNotEmpty) const SizedBox(height: 12),
+              ],
+              if (widget.haramItems.isNotEmpty) ...[
+                Text(
+                  'Haram (Forbidden):',
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        color: const Color(0xFFC62828),
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                const SizedBox(height: 8),
+                for (final item in widget.haramItems)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 6),
+                    child: Text(
+                      item,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ),
+              ],
+            ],
+          ],
+        ),
       ),
     );
   }

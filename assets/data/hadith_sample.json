@@ -1,0 +1,94 @@
+{
+  "collections": [
+    {
+      "id": 1,
+      "nameEn": "Sahih Al-Bukhari",
+      "nameBn": "সহীহ আল-বুখারী",
+      "authorEn": "Muhammad al-Bukhari",
+      "authorBn": "মুহাম্মাদ আল-বুখারী",
+      "hadithCount": 7275,
+      "hadith": [
+        {
+          "number": 1,
+          "text": "The Prophet (ﷺ) said: Actions are judged by motives (intentions), so each man will have what he intended.",
+          "textBn": "নবী (সল্লাল্লাহু আলাইহি ওয়া সাল্লাম) বলেছেন: 'আমল নিয়্যতের উপর নির্ভরশীল, তাই প্রতিটি ব্যক্তি তার নিয়্যত অনুযায়ী তার প্রতিফল পাবে।'",
+          "narrator": "Umar ibn Al-Khattab",
+          "narratorBn": "উমার ইবনু আল-খাত্তাব",
+          "explanation": "This hadith is about the importance of intentions in all actions. Muslims should perform all acts of worship and good deeds with pure intentions and seeking the pleasure of Allah.",
+          "explanationBn": "এই হাদিসটি সমস্ত কাজে নিয়্যতের গুরুত্ব সম্পর্কে। মুসলিমদের সমস্ত ইবাদত ও ভালো কাজ বিশুদ্ধ নিয়্যত এবং আল্লাহর সন্তুষ্টি খোঁজার জন্য করতে হবে।",
+          "reference": "Sahih Al-Bukhari 1"
+        },
+        {
+          "number": 2,
+          "text": "The Prophet (ﷺ) said: Islam is built on five pillars: testifying that there is none worthy of worship except Allah and that Muhammad is the messenger of Allah, establishing prayer, paying Zakat, fasting in Ramadan, and performing pilgrimage to the House of Allah.",
+          "textBn": "নবী (সল্লাল্লাহু আলাইহি ওয়া সাল্লাম) বলেছেন: 'ইসলাম পাঁচটি স্তম্ভের উপর দাঁড়িয়ে আছে: আল্লাহ ছাড়া কেউ ইলাহ নেই এবং মুহাম্মাদ আল্লাহর রাসূল - এই সাক্ষ্য দেওয়া, নামাজ কায়েম করা, জাকাত দেওয়া, রমজানে রোজা রাখা এবং আল্লাহর ঘরের হজ আদায় করা।'",
+          "narrator": "Abdullah ibn Umar",
+          "narratorBn": "আবদুল্লাহ ইবনু উমার",
+          "explanation": "This hadith mentions the five pillars of Islam, which are the fundamental obligations for every Muslim.",
+          "explanationBn": "এই হাদিসটি ইসলামের পাঁচটি স্তম্ভ উল্লেখ করে যা প্রতিটি মুসলিমের জন্য মৌলিক বাধ্যবাধকতা।",
+          "reference": "Sahih Al-Bukhari 8"
+        },
+        {
+          "number": 3,
+          "text": "The Prophet (ﷺ) said: The best of you are those who have the best manners and character.",
+          "textBn": "নবী (সল্লাল্লাহু আলাইহি ওয়া সাল্লাম) বলেছেন: 'তোমাদের মধ্যে সেরা হল যারা আচরণ এবং চরিত্রে সেরা।'",
+          "narrator": "Abu Huraira",
+          "narratorBn": "আবূ হুরায়রা",
+          "explanation": "This hadith emphasizes the importance of good character and moral conduct in Islam. The Prophet valued morality and ethics highly.",
+          "explanationBn": "এই হাদিসটি ইসলামে ভালো চরিত্র এবং নৈতিক আচরণের গুরুত্ব জোর দেয়। নবী নৈতিকতা এবং সততাকে অত্যন্ত মূল্য দিয়েছেন।",
+          "reference": "Sahih Al-Bukhari 3331"
+        },
+        {
+          "number": 4,
+          "text": "The Prophet (ﷺ) said: The most beloved of people to Allah are those who are most beneficial to people.",
+          "textBn": "নবী (সল্লাল্লাহু আলাইহি ওয়া সাল্লাম) বলেছেন: 'আল্লাহর কাছে সবচেয়ে প্রিয় মানুষ হল যারা মানুষের জন্য সবচেয়ে উপকারী।'",
+          "narrator": "Anas ibn Malik",
+          "narratorBn": "আনাস ইবনু মালিক",
+          "explanation": "This hadith teaches that serving humanity and being beneficial to others is highly valued in Islam. It encourages believers to help others.",
+          "explanationBn": "এই হাদিসটি শেখায় যে মানবতার সেবা করা এবং অন্যদের জন্য উপকারী হওয়া ইসলামে অত্যন্ত মূল্যবান। এটি বিশ্বাসীদের অন্যদের সাহায্য করতে উৎসাহিত করে।",
+          "reference": "Sunan Ibn Majah 4106"
+        },
+        {
+          "number": 5,
+          "text": "The Prophet (ﷺ) said: None of you believes until he loves for his brother what he loves for himself.",
+          "textBn": "নবী (সল্লাল্লাহু আলাইহি ওয়া সাল্লাম) বলেছেন: 'কেউ বিশ্বাসী হতে পারে না যতক্ষণ না সে তার ভাইয়ের জন্য ভালোবাসে যা সে নিজের জন্য ভালোবাসে।'",
+          "narrator": "Anas ibn Malik",
+          "narratorBn": "আনাস ইবনু মালিক",
+          "explanation": "This hadith emphasizes the principle of brotherhood and equality in Islam. Muslims should wish good for others just as they wish for themselves.",
+          "explanationBn": "এই হাদিসটি ইসলামে ভাইয়ত্ব এবং সমতার নীতি জোর দেয়। মুসলিমদের অন্যদের জন্য ভালো কামনা করতে হবে যেমন তারা নিজেদের জন্য কামনা করে।",
+          "reference": "Sahih Al-Bukhari 13"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "nameEn": "Sahih Muslim",
+      "nameBn": "সহীহ মুসলিম",
+      "authorEn": "Muslim ibn al-Hajjaj",
+      "authorBn": "মুসলিম ইবনু হাজ্জাজ",
+      "hadithCount": 5050,
+      "hadith": [
+        {
+          "number": 1,
+          "text": "The Prophet (ﷺ) said: Whoever builds a mosque for Allah, just building a small room, Allah will build a house for him in Paradise.",
+          "textBn": "নবী (সল্লাল্লাহু আলাইহি ওয়া সাল্লাম) বলেছেন: 'যে ব্যক্তি আল্লাহর জন্য মসজিদ নির্মাণ করে, এমনকি একটি ছোট ঘর হলেও, আল্লাহ তার জন্য জান্নায় একটি ঘর নির্মাণ করবেন।'",
+          "narrator": "Uthman ibn Affan",
+          "narratorBn": "উসমান ইবনু আফফান",
+          "explanation": "This hadith encourages building places of worship and emphasizes the reward from Allah for such good deeds.",
+          "explanationBn": "এই হাদিসটি উপাসনার স্থান নির্মাণে উৎসাহিত করে এবং এমন যোগ্য কাজের জন্য আল্লাহর পুরস্কার জোর দেয়।",
+          "reference": "Sahih Muslim 533"
+        },
+        {
+          "number": 2,
+          "text": "The Prophet (ﷺ) said: The best charity is that given when one is in need themselves.",
+          "textBn": "নবী (সল্লাল্লাহু আলাইহি ওয়া সাল্লাম) বলেছেন: 'সেরা দাতব্য হল যখন সেই ব্যক্তি নিজেও অসুস্থ অবস্থায় থাকে তখন দান করে।'",
+          "narrator": "Abu Huraira",
+          "narratorBn": "আবূ হুরায়রা",
+          "explanation": "This highlights that charity given despite personal difficulties is the most virtuous.",
+          "explanationBn": "এটি হাইলাইট করে যে ব্যক্তিগত কঠিনতা সত্ত্বেও দান করা সবচেয়ে সৎ।",
+          "reference": "Sahih Muslim 2157"
+        }
+      ]
+    }
+  ]
+}

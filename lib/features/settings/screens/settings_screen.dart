@@ -7,12 +7,14 @@ class SettingsScreen extends StatelessWidget {
   final AppLanguage language;
   final AppSettings settings;
   final ValueChanged<AppSettings> onSettingsChanged;
+  final VoidCallback? onSignOut;
 
   const SettingsScreen({
     super.key,
     required this.language,
     required this.settings,
     required this.onSettingsChanged,
+    this.onSignOut,
   });
 
   @override
@@ -30,7 +32,8 @@ class SettingsScreen extends StatelessWidget {
               title: Text(lang == AppLanguage.bn ? 'ডার্ক মোড' : 'Dark mode'),
               trailing: Switch(
                 value: settings.darkMode,
-                onChanged: (v) => onSettingsChanged(settings.copyWith(darkMode: v)),
+                onChanged: (v) =>
+                    onSettingsChanged(settings.copyWith(darkMode: v)),
               ),
             ),
           ),
@@ -38,11 +41,14 @@ class SettingsScreen extends StatelessWidget {
           Card(
             child: ListTile(
               title: Text(lang == AppLanguage.bn ? 'ভাষা' : 'Language'),
-              subtitle: Text(lang == AppLanguage.bn ? 'বাংলা / English' : 'Bangla / English'),
+              subtitle: Text(lang == AppLanguage.bn
+                  ? 'বাংলা / English'
+                  : 'Bangla / English'),
               trailing: DropdownButton<AppLanguage>(
                 value: settings.language,
                 items: const [
-                  DropdownMenuItem(value: AppLanguage.en, child: Text('English')),
+                  DropdownMenuItem(
+                      value: AppLanguage.en, child: Text('English')),
                   DropdownMenuItem(value: AppLanguage.bn, child: Text('বাংলা')),
                 ],
                 onChanged: (v) {
@@ -57,13 +63,16 @@ class SettingsScreen extends StatelessWidget {
             child: Column(
               children: [
                 ListTile(
-                  title: Text(lang == AppLanguage.bn ? 'নামাজের হিসাব' : 'Prayer calculation'),
+                  title: Text(lang == AppLanguage.bn
+                      ? 'নামাজের হিসাব'
+                      : 'Prayer calculation'),
                   subtitle: Text(lang == AppLanguage.bn
                       ? 'পরে পরিবর্তন করা যাবে।'
                       : 'You can adjust later.'),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                   child: DropdownButton<PrayerCalculationMethod>(
                     isExpanded: true,
                     value: settings.prayerCalculationMethod,
@@ -71,13 +80,16 @@ class SettingsScreen extends StatelessWidget {
                         .map(
                           (m) => DropdownMenuItem(
                             value: m,
-                            child: Text(m.labelEn()),
+                            child: Text(
+                              lang == AppLanguage.bn ? m.labelBn() : m.labelEn(),
+                            ),
                           ),
                         )
                         .toList(),
                     onChanged: (v) {
                       if (v == null) return;
-                      onSettingsChanged(settings.copyWith(prayerCalculationMethod: v));
+                      onSettingsChanged(
+                          settings.copyWith(prayerCalculationMethod: v));
                     },
                   ),
                 ),
@@ -87,19 +99,29 @@ class SettingsScreen extends StatelessWidget {
           const SizedBox(height: 12),
           Card(
             child: SwitchListTile(
-              title: Text(lang == AppLanguage.bn ? 'অ্যাপ নোটিফিকেশন' : 'Notifications'),
-              subtitle: Text(lang == AppLanguage.bn ? 'শান্তভাবে মনে করিয়ে দেয়' : 'Gentle reminders only'),
+              title: Text(lang == AppLanguage.bn
+                  ? 'অ্যাপ নোটিফিকেশন'
+                  : 'Notifications'),
+              subtitle: Text(lang == AppLanguage.bn
+                  ? 'শান্তভাবে মনে করিয়ে দেয়'
+                  : 'Gentle reminders only'),
               value: settings.notificationsEnabled,
-              onChanged: (v) => onSettingsChanged(settings.copyWith(notificationsEnabled: v)),
+              onChanged: (v) =>
+                  onSettingsChanged(settings.copyWith(notificationsEnabled: v)),
             ),
           ),
           const SizedBox(height: 12),
           Card(
             child: SwitchListTile(
-              title: Text(lang == AppLanguage.bn ? 'ভাইব্রেশন ফিডব্যাক' : 'Vibration feedback'),
-              subtitle: Text(lang == AppLanguage.bn ? 'যিকির কাউন্টে' : 'For tasbih counter'),
+              title: Text(lang == AppLanguage.bn
+                  ? 'ভাইব্রেশন ফিডব্যাক'
+                  : 'Vibration feedback'),
+              subtitle: Text(lang == AppLanguage.bn
+                  ? 'যিকির কাউন্টে'
+                  : 'For tasbih counter'),
               value: settings.vibrationEnabled,
-              onChanged: (v) => onSettingsChanged(settings.copyWith(vibrationEnabled: v)),
+              onChanged: (v) =>
+                  onSettingsChanged(settings.copyWith(vibrationEnabled: v)),
             ),
           ),
           const SizedBox(height: 12),
@@ -110,19 +132,25 @@ class SettingsScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    lang == AppLanguage.bn ? 'আযান চালু রাখুন' : 'Enable azan per prayer',
+                    lang == AppLanguage.bn
+                        ? 'আযান চালু রাখুন'
+                        : 'Enable azan per prayer',
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const SizedBox(height: 8),
                   for (final prayer in PrayerName.values)
                     CheckboxListTile(
-                      title: Text(lang == AppLanguage.bn ? prayer.labelBn() : prayer.labelEn()),
+                      title: Text(lang == AppLanguage.bn
+                          ? prayer.labelBn()
+                          : prayer.labelEn()),
                       value: settings.azanEnabled[prayer] ?? true,
                       onChanged: settings.notificationsEnabled
                           ? (v) {
-                              final next = Map<PrayerName, bool>.from(settings.azanEnabled);
+                              final next = Map<PrayerName, bool>.from(
+                                  settings.azanEnabled);
                               next[prayer] = v ?? true;
-                              onSettingsChanged(settings.copyWith(azanEnabled: next));
+                              onSettingsChanged(
+                                  settings.copyWith(azanEnabled: next));
                             }
                           : null,
                     ),
@@ -133,7 +161,9 @@ class SettingsScreen extends StatelessWidget {
           const SizedBox(height: 12),
           Card(
             child: ListTile(
-              title: Text(lang == AppLanguage.bn ? 'ডাটা ব্যাকআপ (পরবর্তীতে)' : 'Data backup (later)'),
+              title: Text(lang == AppLanguage.bn
+                  ? 'ডাটা ব্যাকআপ (পরবর্তীতে)'
+                  : 'Data backup (later)'),
               subtitle: Text(lang == AppLanguage.bn
                   ? 'Firebase / গেস্ট ডিভাইস ব্যাকআপ আকারে যোগ করা হবে।'
                   : 'Add Firebase & guest restore flows later.'),
@@ -149,9 +179,55 @@ class SettingsScreen extends StatelessWidget {
               },
             ),
           ),
+          const SizedBox(height: 12),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.logout, color: Colors.red),
+              title: Text(
+                lang == AppLanguage.bn ? 'লগ আউট' : 'Sign Out',
+                style: const TextStyle(color: Colors.red),
+              ),
+              onTap: onSignOut != null
+                  ? () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: Text(
+                            lang == AppLanguage.bn
+                                ? 'নিশ্চিত করুন'
+                                : 'Are you sure?',
+                          ),
+                          content: Text(
+                            lang == AppLanguage.bn
+                                ? 'আপনি লগ আউট করতে চান?'
+                                : 'Do you want to sign out?',
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: Text(
+                                lang == AppLanguage.bn ? 'বাতিল' : 'Cancel',
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                onSignOut?.call();
+                              },
+                              child: Text(
+                                lang == AppLanguage.bn ? 'লগ আউট' : 'Sign Out',
+                                style: const TextStyle(color: Colors.red),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                  : null,
+            ),
+          ),
         ],
       ),
     );
   }
 }
-

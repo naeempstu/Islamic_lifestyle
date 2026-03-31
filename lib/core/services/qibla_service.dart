@@ -27,11 +27,24 @@ class QiblaService {
     required double longitude,
   }) {
     final qiblaBearing = qiblaBearingDegrees(latitude, longitude);
-    return FlutterCompass.events!.map((event) {
+    
+    // Get compass events
+    final events = FlutterCompass.events;
+    
+    if (events == null) {
+      // If compass is not available, return a stream that emits the bearing continuously
+      return Stream.periodic(
+        const Duration(milliseconds: 100),
+        (_) => qiblaBearing,
+      );
+    }
+    
+    return events.map((event) {
       final heading = event.heading ?? 0.0;
-      // Positive rotation rotates clockwise.
-      return qiblaBearing - heading;
-    });
+      // Calculate the rotation needed - negate to get correct direction
+      final rotation = (qiblaBearing - heading);
+      return rotation;
+    }).asBroadcastStream();
   }
 
   static double _toRad(double deg) => deg * (pi / 180.0);

@@ -7,16 +7,14 @@ import '../../../core/services/location_service.dart';
 import '../data/gentle_messages.dart';
 import '../../prayer/services/prayer_times.dart';
 import '../../prayer/services/prayer_times_service.dart';
-import '../../routine/data/daily_routine_store.dart';
 
-enum HomeQuickAction { qibla, quran, tasbih, halal }
+enum HomeQuickAction { qibla, quran, tasbih, halal, masjid, deenShiksha, hadith }
 
 class HomeScreen extends StatefulWidget {
   final AppLanguage language;
   final PrayerCalculationMethod prayerCalculationMethod;
   final LocationService locationService;
   final PrayerTimesService prayerTimesService;
-  final DailyRoutineStore routineStore;
   final bool alarmEnabled;
   final ValueChanged<bool> onAlarmToggle;
   final ValueChanged<HomeQuickAction> onQuickAccessTap;
@@ -29,7 +27,6 @@ class HomeScreen extends StatefulWidget {
     required this.prayerCalculationMethod,
     required this.locationService,
     required this.prayerTimesService,
-    required this.routineStore,
     required this.alarmEnabled,
     required this.onAlarmToggle,
     required this.onQuickAccessTap,
@@ -43,7 +40,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late Future<PrayerTimesModel> _prayerFuture;
-  late Future<DailyRoutine> _routineFuture;
   late Future<_LocationSnapshot> _locationFuture;
 
   @override
@@ -54,13 +50,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _refreshData() {
     _prayerFuture = _loadTimes();
-    _routineFuture = widget.routineStore.loadForDate(DateTime.now());
     _locationFuture = _loadLocation();
   }
 
   Future<void> _onRefresh() async {
     setState(_refreshData);
-    await Future.wait([_prayerFuture, _routineFuture, _locationFuture]);
+    await Future.wait([_prayerFuture, _locationFuture]);
   }
 
   String _greeting() {
@@ -96,6 +91,27 @@ class _HomeScreenState extends State<HomeScreen> {
     ];
     final month = monthsEn[(hijri.hMonth - 1).clamp(0, 11)];
     return '$day $month $year AH';
+  }
+
+  String _quickAccessLabel(String key) {
+    const labels = {
+      'qibla_en': 'Qibla\nDirection',
+      'qibla_bn': 'কিবলা\nদিক',
+      'quran_en': 'Qur\'an',
+      'quran_bn': 'কুরআন',
+      'tasbih_en': 'Tasbih',
+      'tasbih_bn': 'তাসবিহ',
+      'halal_en': 'Halal\nGuide',
+      'halal_bn': 'হালাল\nগাইড',
+      'masjid_en': 'Find\nMasjid',
+      'masjid_bn': 'মসজিদ\nখুঁজুন',
+      'deen_en': 'Deen\nEducation',
+      'deen_bn': 'দীন\nশিক্ষা',
+      'hadith_en': 'Hadith',
+      'hadith_bn': 'হাদিস',
+    };
+    final langSuffix = widget.language == AppLanguage.bn ? '_bn' : '_en';
+    return labels['$key$langSuffix'] ?? '';
   }
 
   Future<PrayerTimesModel> _loadTimes() async {
@@ -439,15 +455,38 @@ class _HomeScreenState extends State<HomeScreen> {
                   return const Center(child: CircularProgressIndicator());
                 }
                 final times = snapshot.data!;
-                return _PrayerTimesCard(
-                  language: widget.language,
-                  times: times,
+                
+                // Check if it's Ramadan
+                final hijri = HijriCalendarConfig.now();
+                final isRamadan = hijri.hMonth == 9; // Ramadan is month 9
+
+                return Column(
+                  children: [
+                    _SehriIftarCard(
+                      language: widget.language,
+                      fajrTime: times.fajr,
+                      maghribTime: times.maghrib,
+                      isRamadan: isRamadan,
+                    ),
+                    const SizedBox(height: 12),
+                    _ForbiddenPrayerTimesCard(
+                      language: widget.language,
+                      fajr: times.fajr,
+                      dhuhr: times.dhuhr,
+                      maghrib: times.maghrib,
+                    ),
+                    const SizedBox(height: 16),
+                    _PrayerTimesCard(
+                      language: widget.language,
+                      times: times,
+                    ),
+                  ],
                 );
               },
             ),
             const SizedBox(height: 20),
             Text(
-              'Quick Access',
+              widget.language == AppLanguage.bn ? 'দ্রুত অ্যাক্সেস' : 'Quick Access',
               style: Theme.of(
                 context,
               ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
@@ -455,20 +494,28 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 12),
             LayoutBuilder(
               builder: (context, constraints) {
+                // Responsive grid sizing to avoid overflow on narrow screens.
                 final width = constraints.maxWidth;
-                final crossAxisCount = width < 380 ? 2 : 4;
-                final ratio = crossAxisCount == 2 ? 1.85 : 0.95;
+                const spacing = 12.0;
+                const maxTileWidth = 160.0;
+                final crossAxisCount = (width / (maxTileWidth + spacing))
+                    .floor()
+                    .clamp(2, 4);
+                final tileWidth =
+                    (width - spacing * (crossAxisCount - 1)) / crossAxisCount;
+                const tileHeight = 118.0;
+                final ratio = tileWidth / tileHeight;
                 return GridView.count(
                   crossAxisCount: crossAxisCount,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
+                  crossAxisSpacing: spacing,
+                  mainAxisSpacing: spacing,
                   childAspectRatio: ratio,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   children: [
                     _QuickItem(
                       icon: Icons.explore_outlined,
-                      label: 'Qibla\nDirection',
+                      label: _quickAccessLabel('qibla'),
                       bg: const Color(0xFFE3ECE6),
                       fg: const Color(0xFF1D7E53),
                       onTap: () =>
@@ -476,7 +523,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     _QuickItem(
                       icon: Icons.menu_book_outlined,
-                      label: 'Qur\'an',
+                      label: _quickAccessLabel('quran'),
                       bg: const Color(0xFFF7F0DD),
                       fg: const Color(0xFFC7A452),
                       onTap: () =>
@@ -484,7 +531,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     _QuickItem(
                       icon: Icons.self_improvement_outlined,
-                      label: 'Tasbih',
+                      label: _quickAccessLabel('tasbih'),
                       bg: const Color(0xFFE9E9EE),
                       fg: const Color(0xFF1A1C30),
                       onTap: () =>
@@ -492,90 +539,43 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     _QuickItem(
                       icon: Icons.restaurant_menu_outlined,
-                      label: 'Halal\nGuide',
+                      label: _quickAccessLabel('halal'),
                       bg: const Color(0xFFE3ECE6),
                       fg: const Color(0xFF1D7E53),
                       onTap: () =>
                           widget.onQuickAccessTap(HomeQuickAction.halal),
                     ),
+                    _QuickItem(
+                      icon: Icons.location_on_outlined,
+                      label: _quickAccessLabel('masjid'),
+                      bg: const Color(0xFFF3E5D8),
+                      fg: const Color(0xFFA0704D),
+                      onTap: () =>
+                          widget.onQuickAccessTap(HomeQuickAction.masjid),
+                    ),
+                    _QuickItem(
+                      icon: Icons.school_outlined,
+                      label: _quickAccessLabel('deen'),
+                      bg: const Color(0xFFF0E4FF),
+                      fg: const Color(0xFF7C3AED),
+                      onTap: () =>
+                          widget.onQuickAccessTap(HomeQuickAction.deenShiksha),
+                    ),
+                    _QuickItem(
+                      icon: Icons.book_outlined,
+                      label: _quickAccessLabel('hadith'),
+                      bg: const Color(0xFFE8F5E9),
+                      fg: const Color(0xFF2E7D32),
+                      onTap: () =>
+                          widget.onQuickAccessTap(HomeQuickAction.hadith),
+                    ),
                   ],
-                );
-              },
-            ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Text(
-                  'Prayer Checklist',
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const Spacer(),
-                Text(
-                  'View All',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: const Color(0xFF1D7E53),
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            FutureBuilder<DailyRoutine>(
-              future: _routineFuture,
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) return const SizedBox.shrink();
-                final routine = snapshot.data!;
-                final done = [
-                  routine.salahCompleted,
-                  routine.quranDone,
-                  routine.dhikrDone,
-                  routine.duaDone,
-                  routine.goodDeedDone,
-                ].where((v) => v).length;
-                return Text(
-                  '$done/5',
-                  style: Theme.of(context).textTheme.titleMedium,
                 );
               },
             ),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _rowTile(
-    IconData icon,
-    String title,
-    Color color, {
-    String? subtitle,
-  }) {
-    return Row(
-      children: [
-        Icon(icon, color: color),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFF2A2E47),
-                ),
-              ),
-              if (subtitle != null)
-                Text(
-                  subtitle,
-                  style: const TextStyle(color: Color(0xFF8E8F9A)),
-                ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }
@@ -764,6 +764,341 @@ class _QuickItemState extends State<_QuickItem> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _SehriIftarCard extends StatelessWidget {
+  final AppLanguage language;
+  final DateTime fajrTime;
+  final DateTime maghribTime;
+  final bool isRamadan;
+
+  const _SehriIftarCard({
+    required this.language,
+    required this.fajrTime,
+    required this.maghribTime,
+    required this.isRamadan,
+  });
+
+  String _format(DateTime dt) => DateFormat.jm().format(dt);
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<int>(
+      stream: Stream.periodic(const Duration(minutes: 1), (x) => x),
+      builder: (context, _) {
+        final now = DateTime.now();
+        
+        // Calculate time until Sehri (Fajr) and time until Iftar (Maghrib)
+        final sehriLeft = fajrTime.difference(now);
+        final iftarLeft = maghribTime.difference(now);
+        
+        // Determine which one is next
+        final isSehriNext = sehriLeft.isNegative == false && 
+                           (iftarLeft.isNegative || sehriLeft < iftarLeft);
+        
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(22),
+            gradient: const LinearGradient(
+              colors: [Color(0xFF8B2635), Color(0xFFC23B57)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  const Icon(
+                    Icons.nightlife,
+                    color: Colors.white,
+                    size: 40,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          isRamadan
+                              ? (language == AppLanguage.bn
+                                  ? 'রমজান - সেহরি ও ইফতার'
+                                  : 'Ramadan - Sehri & Iftar')
+                              : (language == AppLanguage.bn
+                                  ? 'সেহরি ও ইফতার'
+                                  : 'Sehri & Iftar'),
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          language == AppLanguage.bn ? 'সেহরির সময়' : 'Sehri Time',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 14,
+                          ),
+                        ),
+                        Text(
+                          _format(fajrTime),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              const Divider(color: Colors.white24),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  const Icon(
+                    Icons.wb_sunny,
+                    color: Color(0xFFFFD700),
+                    size: 40,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          language == AppLanguage.bn
+                              ? 'ইফতারের সময়'
+                              : 'Iftar Time',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 14,
+                          ),
+                        ),
+                        Text(
+                          _format(maghribTime),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (isSehriNext)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            '${sehriLeft.inHours}h',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
+                            ),
+                          ),
+                          Text(
+                            language == AppLanguage.bn ? 'বাকি' : 'left',
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  else
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            '${iftarLeft.inHours}h',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
+                            ),
+                          ),
+                          Text(
+                            language == AppLanguage.bn ? 'বাকি' : 'left',
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _ForbiddenPrayerTimesCard extends StatelessWidget {
+  final AppLanguage language;
+  final DateTime fajr;
+  final DateTime dhuhr;
+  final DateTime maghrib;
+
+  const _ForbiddenPrayerTimesCard({
+    required this.language,
+    required this.fajr,
+    required this.dhuhr,
+    required this.maghrib,
+  });
+
+  String _format(DateTime dt) => DateFormat.jm().format(dt);
+
+  @override
+  Widget build(BuildContext context) {
+    // Calculate forbidden prayer times (nisiddo times)
+    // 1. Ishraq: 15-20 minutes after sunrise (Fajr)
+    final ishraqStart = fajr.add(const Duration(minutes: 15));
+    final ishraqEnd = fajr.add(const Duration(minutes: 20));
+
+    // 2. Zawal (Sun at zenith): Around 20 minutes before Dhuhr
+    final zawalStart = dhuhr.subtract(const Duration(minutes: 20));
+    final zawalEnd = dhuhr.add(const Duration(minutes: 5));
+
+    // 3. After Maghrib (Ghuruub): Until darkness fully sets (about 20 min after Maghrib)
+    final ghuruubStart = maghrib;
+    final ghuruubEnd = maghrib.add(const Duration(minutes: 20));
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(22),
+        gradient: const LinearGradient(
+          colors: [Color(0xFF6B4C9A), Color(0xFF9B6FA8)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.block_outlined,
+                color: Colors.white,
+                size: 28,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  language == AppLanguage.bn
+                      ? 'নামাজ নিষিদ্ধ সময় (নিসিদ্ধ)'
+                      : 'Forbidden Prayer Times (Nisiddo)',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          // Ishraq
+          _ForbiddenTimeRow(
+            language: language,
+            label: language == AppLanguage.bn ? 'ইশরাক' : 'Ishraq',
+            start: _format(ishraqStart),
+            end: _format(ishraqEnd),
+          ),
+          const SizedBox(height: 8),
+          // Zawal
+          _ForbiddenTimeRow(
+            language: language,
+            label: language == AppLanguage.bn ? 'যোহরের সময়' : 'Zawal (Midday)',
+            start: _format(zawalStart),
+            end: _format(zawalEnd),
+          ),
+          const SizedBox(height: 8),
+          // Ghuruub
+          _ForbiddenTimeRow(
+            language: language,
+            label: language == AppLanguage.bn ? 'সূর্যাস্তের পর' : 'After Sunset',
+            start: _format(ghuruubStart),
+            end: _format(ghuruubEnd),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            language == AppLanguage.bn
+                ? 'ইসলামী নিয়মে এই সময়গুলিতে নামাজ নিষিদ্ধ'
+                : 'Prayer is discouraged during these times in Islam',
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 11,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ForbiddenTimeRow extends StatelessWidget {
+  final AppLanguage language;
+  final String label;
+  final String start;
+  final String end;
+
+  const _ForbiddenTimeRow({
+    required this.language,
+    required this.label,
+    required this.start,
+    required this.end,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 13,
+            ),
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Text(
+            '$start - $end',
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+              fontSize: 12,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

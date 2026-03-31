@@ -93,22 +93,21 @@ class _RamadanScreenState extends State<RamadanScreen> {
             const SizedBox(height: 12),
             _RamadanFeatureGrid(language: widget.language),
             const SizedBox(height: 12),
-            if (isRamadan)
-              FutureBuilder<PrayerTimesModel>(
-                future: _timesFuture,
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  final times = snapshot.data!;
-                  return _RamadanTimingsCard(
-                    language: widget.language,
-                    times: times,
-                  );
-                },
-              ),
+            FutureBuilder<PrayerTimesModel>(
+              future: _timesFuture,
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                final times = snapshot.data!;
+                return _RamadanTimingsCard(
+                  language: widget.language,
+                  times: times,
+                );
+              },
+            ),
             const SizedBox(height: 12),
-            if (isRamadan) _RamadanChecklist(language: widget.language),
+            _RamadanChecklist(language: widget.language),
           ],
         ),
       ),
@@ -198,17 +197,25 @@ class _RamadanChecklist extends StatefulWidget {
 
 class _RamadanChecklistState extends State<_RamadanChecklist> {
   bool _fasting = false;
+  bool _sehriEaten = false;
+  bool _iftarTime = false;
   bool _quranGoal = false;
-  bool _charityReminder = false;
+  bool _taraweeh = false;
+  bool _charity = false;
+  bool _parentsCare = false;
 
   @override
   Widget build(BuildContext context) {
     final score = [
       _fasting,
+      _sehriEaten,
+      _iftarTime,
       _quranGoal,
-      _charityReminder,
+      _taraweeh,
+      _charity,
+      _parentsCare,
     ].where((v) => v).length;
-    final progress = score / 3;
+    final progress = score / 7;
     return Card(
       elevation: 0,
       child: Padding(
@@ -232,40 +239,82 @@ class _RamadanChecklistState extends State<_RamadanChecklist> {
                 backgroundColor: const Color(0xFFE4ECE7),
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 6),
+            Text(
+              '${(progress * 100).toStringAsFixed(0)}% ${widget.language == AppLanguage.bn ? 'সম্পন্ন' : 'completed'}',
+              style: Theme.of(context).textTheme.labelSmall,
+            ),
+            const SizedBox(height: 12),
             CheckboxListTile(
+              contentPadding: EdgeInsets.zero,
               title: Text(
-                widget.language == AppLanguage.bn
-                    ? 'রোজা (যাদের ওপর প্রযোজ্য)'
-                    : 'Fasting (for those who are able)',
+                widget.language == AppLanguage.bn ? 'রোজা রাখা' : 'Keep fasting',
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
               value: _fasting,
               onChanged: (v) => setState(() => _fasting = v ?? false),
             ),
             CheckboxListTile(
+              contentPadding: EdgeInsets.zero,
               title: Text(
                 widget.language == AppLanguage.bn
-                    ? 'কুরআন পড়া'
-                    : 'Qur’an reading',
+                    ? 'সেহরি খাওয়া'
+                    : 'Eat Sehri',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              value: _sehriEaten,
+              onChanged: (v) => setState(() => _sehriEaten = v ?? false),
+            ),
+            CheckboxListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(
+                widget.language == AppLanguage.bn
+                    ? 'ইফতারে অংশ নেওয়া'
+                    : 'Break fast (Iftar)',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              value: _iftarTime,
+              onChanged: (v) => setState(() => _iftarTime = v ?? false),
+            ),
+            CheckboxListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(
+                widget.language == AppLanguage.bn ? 'কুরআন পড়া' : 'Read Qur\'an',
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
               value: _quranGoal,
               onChanged: (v) => setState(() => _quranGoal = v ?? false),
             ),
             CheckboxListTile(
+              contentPadding: EdgeInsets.zero,
               title: Text(
                 widget.language == AppLanguage.bn
-                    ? 'সাদাকাহ মনে রাখা'
-                    : 'Sadaqah reminder',
+                    ? 'তারাবিহ নামাজ'
+                    : 'Taraweeh prayers',
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
-              value: _charityReminder,
-              onChanged: (v) => setState(() => _charityReminder = v ?? false),
+              value: _taraweeh,
+              onChanged: (v) => setState(() => _taraweeh = v ?? false),
             ),
-            const SizedBox(height: 8),
-            Text(
-              widget.language == AppLanguage.bn
-                  ? 'নিজেকে চাপ দেবেন না। আল্লাহ সহজ করে দেন।'
-                  : 'No pressure. May Allah make it easy.',
-              style: Theme.of(context).textTheme.bodySmall,
+            CheckboxListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(
+                widget.language == AppLanguage.bn ? 'সাদাকাহ দেওয়া' : 'Give Sadaqah',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              value: _charity,
+              onChanged: (v) => setState(() => _charity = v ?? false),
+            ),
+            CheckboxListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(
+                widget.language == AppLanguage.bn
+                    ? 'পিতামাতার সেবা'
+                    : 'Care for parents',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              value: _parentsCare,
+              onChanged: (v) => setState(() => _parentsCare = v ?? false),
             ),
           ],
         ),

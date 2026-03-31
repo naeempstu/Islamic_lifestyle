@@ -17,12 +17,14 @@ class QuranSurah {
   final String nameEn;
   final String nameBn;
   final List<QuranAyah> ayahs;
+  final int? ayahCount;
 
   const QuranSurah({
     required this.id,
     required this.nameEn,
     required this.nameBn,
-    required this.ayahs,
+    this.ayahs = const [],
+    this.ayahCount,
   });
 }
 

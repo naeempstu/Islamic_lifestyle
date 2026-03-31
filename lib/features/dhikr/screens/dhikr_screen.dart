@@ -62,7 +62,10 @@ class _DhikrScreenState extends State<DhikrScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
-                Text('Dhikr', style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800)),
+                Text(
+                  widget.language == AppLanguage.bn ? 'যিকির' : 'Dhikr',
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800),
+                ),
               ],
             ),
           ),
@@ -71,8 +74,12 @@ class _DhikrScreenState extends State<DhikrScreen> {
             padding: EdgeInsets.symmetric(horizontal: 16),
             child: TabBar(
               tabs: [
-                Tab(text: 'Dhikr'),
-                Tab(text: 'Duas'),
+                Tab(
+                  text: 'Dhikr'
+                ),
+                Tab(
+                  text: 'Duas'
+                ),
               ],
             ),
           ),

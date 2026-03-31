@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../core/models/app_enums.dart';
 import '../core/models/app_settings.dart';
@@ -19,6 +20,10 @@ import '../features/ramadan/screens/ramadan_screen.dart';
 import '../features/settings/screens/settings_screen.dart';
 import '../features/dhikr/screens/dhikr_screen.dart';
 import '../features/tasbih/screens/tasbih_only_screen.dart';
+import '../features/masjid/screens/masjid_locator_screen.dart';
+import '../features/deen_shiksha/screens/deen_shiksha_screen.dart';
+import '../features/hadith/data/hadith_repository.dart';
+import '../features/hadith/screens/hadith_reader_screen.dart';
 
 class MainShell extends StatefulWidget {
   final AppSettings settings;
@@ -31,6 +36,7 @@ class MainShell extends StatefulWidget {
   final QuranRepository quranRepository;
   final DhikrRepository dhikrRepository;
   final DuasRepository duasRepository;
+  final HadithRepository hadithRepository;
 
   const MainShell({
     super.key,
@@ -42,6 +48,7 @@ class MainShell extends StatefulWidget {
     required this.quranRepository,
     required this.dhikrRepository,
     required this.duasRepository,
+    required this.hadithRepository,
   });
 
   @override
@@ -81,6 +88,19 @@ class _MainShellState extends State<MainShell> {
     await _reschedulePrayerNotifications();
   }
 
+  Future<void> _handleSignOut() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      if (!mounted) return;
+      Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Sign out failed: $e')),
+      );
+    }
+  }
+
   Future<void> _onHomeQuickAction(HomeQuickAction action) async {
     switch (action) {
       case HomeQuickAction.quran:
@@ -114,6 +134,34 @@ class _MainShellState extends State<MainShell> {
           ),
         );
         break;
+      case HomeQuickAction.masjid:
+        await Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => MasjidLocatorScreen(
+              language: widget.settings.language,
+              locationService: widget.locationService,
+            ),
+          ),
+        );
+        break;
+      case HomeQuickAction.deenShiksha:
+        await Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) =>
+                DeenShikshaScreen(language: widget.settings.language),
+          ),
+        );
+        break;
+      case HomeQuickAction.hadith:
+        await Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => HadithReaderScreen(
+              language: widget.settings.language,
+              hadithRepository: widget.hadithRepository,
+            ),
+          ),
+        );
+        break;
     }
   }
 
@@ -134,6 +182,7 @@ class _MainShellState extends State<MainShell> {
                   widget.onSettingsChanged(s);
                   await _reschedulePrayerNotifications();
                 },
+                onSignOut: _handleSignOut,
               ),
             ),
           );
@@ -156,6 +205,16 @@ class _MainShellState extends State<MainShell> {
             ),
           );
         },
+        onOpenHadith: () async {
+          await Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => HadithReaderScreen(
+                language: lang,
+                hadithRepository: widget.hadithRepository,
+              ),
+            ),
+          );
+        },
       ),
       body: SafeArea(
         child: IndexedStack(
@@ -166,7 +225,6 @@ class _MainShellState extends State<MainShell> {
               prayerCalculationMethod: widget.settings.prayerCalculationMethod,
               locationService: widget.locationService,
               prayerTimesService: widget.prayerTimesService,
-              routineStore: widget.routineStore,
               alarmEnabled: widget.settings.notificationsEnabled,
               onAlarmToggle: _toggleAlarm,
               onQuickAccessTap: _onHomeQuickAction,
@@ -193,6 +251,7 @@ class _MainShellState extends State<MainShell> {
                         widget.onSettingsChanged(s);
                         await _reschedulePrayerNotifications();
                       },
+                      onSignOut: _handleSignOut,
                     ),
                   ),
                 );
@@ -240,7 +299,7 @@ class _MainShellState extends State<MainShell> {
           ),
           BottomNavigationBarItem(
             icon: const Icon(Icons.menu_book_outlined),
-            label: lang == AppLanguage.bn ? 'কুরআন' : 'Qur’an',
+            label: lang == AppLanguage.bn ? 'কুরআন' : "Qur'an",
           ),
           BottomNavigationBarItem(
             icon: const Icon(Icons.self_improvement_outlined),
@@ -261,12 +320,14 @@ class _AppDrawer extends StatelessWidget {
   final Future<void> Function() onOpenSettings;
   final Future<void> Function() onOpenHalal;
   final Future<void> Function() onOpenRamadan;
+  final Future<void> Function() onOpenHadith;
 
   const _AppDrawer({
     required this.language,
     required this.onOpenSettings,
     required this.onOpenHalal,
     required this.onOpenRamadan,
+    required this.onOpenHadith,
   });
 
   @override
@@ -312,6 +373,16 @@ class _AppDrawer extends StatelessWidget {
             onTap: () {
               Navigator.pop(context);
               onOpenRamadan();
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.book_outlined),
+            title: Text(
+              language == AppLanguage.bn ? 'হাদিস' : 'Hadith',
+            ),
+            onTap: () {
+              Navigator.pop(context);
+              onOpenHadith();
             },
           ),
           ListTile(
