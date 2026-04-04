@@ -4,10 +4,28 @@
       "key": "dua-stress-01",
       "titleEn": "When worry feels heavy",
       "titleBn": "চিন্তা ভারী লাগলে",
-      "arabic": "لَا إِلٰهَ إِلَّا اللَّهُ الْعَظِيمُ الْحَلِيمُ، لَا إِلٰهَ إِلَّا اللَّهُ رَبُّ الْعَرْشِ الْعَظِيمِ، لَا إِلٰهَ إِلَّا اللَّهُ رَبُّ السَّمَاوَاتِ وَرَبُّ الْأَرْضِ وَرَبُّ كُلِّ شَيْءٍ",
-      "transliterationEn": "La ilaha illa Allahul-Azeemul-Haleem, la ilaha illa Allah Rabbul-‘Arshil-‘Azeem, la ilaha illa Allah Rabbus-Samawati wa Rabbul-Ardi wa Rabbukulli shay'",
-      "en": "There is no god but Allah, the Magnificent, the Forbearing…",
-      "bn": "আল্লাহ ছাড়া কোনো ইলাহ নেই—পরম মহান, সহনশীল…"
+      "arabic": "لَا إِلٰهَ إِلَّا اللَّهُ الْعَظِيمُ الْحَلِيمُ، لَا إِلٰهَ إِلَّا اللَّهُ رَبُّ الْعَرْشِ الْعَظِيمِ، لَا إِلٰهَ إِلَّا اللَّهُ رَبُّ السَّمَاوَاتِ وَرَبُّ الْأَرْضِ وَرَبُّ كُلِّ شَيْءٍ",
+      "transliterationEn": "La ilaha illa Allahul-Azeemul-Haleem, la ilaha illa Allah Rabbul-Arshil-Azeem, la ilaha illa Allah Rabbus-Samawati wa Rabbul-Ardi wa Rabbukulli shay'",
+      "en": "There is no god but Allah, the Magnificent, the Forbearing. There is no god but Allah, Lord of the Great Throne. There is no god but Allah, Lord of the heavens and the earth, Lord of all things.",
+      "bn": "আল্লাহ ছাড়া কোনো ইলাহ নেই—পরম মহান, সহনশীল। আল্লাহ ছাড়া কোনো ইলাহ নেই, আরশের প্রভু। আল্লাহ ছাড়া কোনো ইলাহ নেই, আকাশ ও পৃথিবীর প্রভু, সকল কিছুর প্রভু।"
+    },
+    {
+      "key": "dua-stress-02",
+      "titleEn": "For relief from distress",
+      "titleBn": "দুশ্চিন্তা থেকে মুক্তির জন্য",
+      "arabic": "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ",
+      "transliterationEn": "Allahumma inni audhu bika min al-hammi wa al-hazani",
+      "en": "O Allah, I seek refuge in You from anxiety and sorrow.",
+      "bn": "হে আল্লাহ, আমি আপনার কাছে চিন্তা এবং দুঃখ থেকে আশ্রয় চাই।"
+    },
+    {
+      "key": "dua-stress-03",
+      "titleEn": "When overwhelmed",
+      "titleBn": "অভিভূত বোধ করলে",
+      "arabic": "حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ",
+      "transliterationEn": "Hasbunallahu wa ni'ma al-wakeel",
+      "en": "Allah is sufficient for us, and He is the best of trustees.",
+      "bn": "আল্লাহই আমাদের জন্য যথেষ্ট, এবং তিনি সর্বোত্তম অভিভাবক।"
     }
   ],
   "illness": [
@@ -16,9 +34,27 @@
       "titleEn": "Healing from Allah",
       "titleBn": "আল্লাহর কাছে আরোগ্য চাইলে",
       "arabic": "اللَّهُمَّ اشْفِهِ شِفَاءً تَامًّا",
-      "transliterationEn": "Allahumma ishfih shifa'an tamm(a).",
+      "transliterationEn": "Allahumma ishfih shifa'an tamma",
       "en": "O Allah, grant him/her complete healing.",
       "bn": "হে আল্লাহ, তাকে সম্পূর্ণ আরোগ্য দান করুন।"
+    },
+    {
+      "key": "dua-illness-02",
+      "titleEn": "For recovery",
+      "titleBn": "সুস্থতার জন্য",
+      "arabic": "اللَّهُمَّ يَا مُعَافِي السَّقَامِ، عَافِهِ",
+      "transliterationEn": "Allahumma ya muafi as-siqam, afih",
+      "en": "O Allah, Healer of diseases, heal him/her.",
+      "bn": "হে আল্লাহ, রোগের চিকিৎসক, তাকে সুস্থ করুন।"
+    },
+    {
+      "key": "dua-illness-03",
+      "titleEn": "For stomach ailments",
+      "titleBn": "পেটের সমস্যার জন্য",
+      "arabic": "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ السُّقْمِ وَالْبَلَاءِ",
+      "transliterationEn": "Allahumma inni audhu bika min as-suqm wa al-balai",
+      "en": "O Allah, I seek refuge in You from illness and affliction.",
+      "bn": "হে আল্লাহ, আমি আপনার কাছে অসুখ এবং বিপর্যয় থেকে আশ্রয় চাই।"
     }
   ],
   "travel": [
@@ -27,9 +63,18 @@
       "titleEn": "For safe travel",
       "titleBn": "সফরের নিরাপত্তার জন্য",
       "arabic": "سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَٰذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ",
-      "transliterationEn": "Subhanalladhi sakhkhara lana hadha wa ma kunna lahu muqrinina.",
+      "transliterationEn": "Subhanalladhi sakhkhara lana hadha wa ma kunna lahu muqrinina",
       "en": "Glory be to the One who subjected this to us, and we were not capable of it.",
-      "bn": "পবিত্র সেই সত্তা, যিনি আমাদের জন্য এটি নিয়োজিত করেছেন; আমরা এর ক্ষমতাবান ছিলাম না।"
+      "bn": "পবিত্র সেই সত্তা, যিনি আমাদের জন্য এটি নিয়োজিত করেছেন; আমরা এর ক্ষমতাবান ছিলাম না।"
+    },
+    {
+      "key": "dua-travel-02",
+      "titleEn": "Before journey",
+      "titleBn": "যাত্রার আগে",
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ فِي سَفَرِي هَٰذَا الْبِرَّ وَالتَّقْوَىٰ",
+      "transliterationEn": "Allahumma inni asaluka fi safari hadha al-birra wa at-taqwa",
+      "en": "O Allah, I ask You for righteousness and obedience in this journey.",
+      "bn": "হে আল্লাহ, এই যাত্রায় আমি আপনার কাছে সততা এবং ভক্তি চাই।"
     }
   ],
   "sleep": [
@@ -38,9 +83,89 @@
       "titleEn": "Before sleep",
       "titleBn": "ঘুমের আগে",
       "arabic": "بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا",
-      "transliterationEn": "Bismika Allahumma amootu wa ahya.",
+      "transliterationEn": "Bismika Allahumma amootu wa ahya",
       "en": "In Your name, O Allah, I die and I live.",
       "bn": "হে আল্লাহ, আপনার নামে আমি মৃত্যুবরণ করি এবং জীবিত হই।"
+    },
+    {
+      "key": "dua-sleep-02",
+      "titleEn": "For peaceful sleep",
+      "titleBn": "শান্তিপূর্ণ ঘুমের জন্য",
+      "arabic": "اللَّهُمَّ قِنِي عَذَابَكَ يَوْمَ تَبْعَثُ عِبَادَكَ",
+      "transliterationEn": "Allahumma qini adhaba-ka yawma tabathu ibadak",
+      "en": "O Allah, protect me from Your punishment on the Day You raise Your servants.",
+      "bn": "হে আল্লাহ, যেদিন আপনি আপনার বান্দাদের পুনরুত্থান করবেন সেদিন আমাকে আপনার শাস্তি থেকে রক্ষা করুন।"
+    }
+  ],
+  "ramadan": [
+    {
+      "key": "dua-ramadan-01",
+      "titleEn": "When breaking fast",
+      "titleBn": "ইফতারের সময়",
+      "arabic": "اللَّهُمَّ إِنِّي لَكَ صُمْتُ وَبِكَ آمَنْتُ وَعَلَىٰ رِزْقِكَ أَفْطَرْتُ",
+      "transliterationEn": "Allahumma inni laka sumtu wa bika amantu wa ala ri-zq-ika aftartu",
+      "en": "O Allah, for You I fasted, in You I believed, and with Your provision I break my fast.",
+      "bn": "হে আল্লাহ, আমি আপনার জন্য রোজা রেখেছি, আপনার উপর বিশ্বাস করেছি এবং আপনার রিজিক দিয়ে ইফতার করছি।"
+    },
+    {
+      "key": "dua-ramadan-02",
+      "titleEn": "Forgiveness in Ramadan",
+      "titleBn": "রমজানে ক্ষমার জন্য",
+      "arabic": "اللَّهُمَّ إِنَّكَ عَفُوٌّ تُحِبُّ الْعَفْوَ فَاعْفُ عَنِّي",
+      "transliterationEn": "Allahumma innaka afuwwun tuhibbul-afwa fafu anni",
+      "en": "O Allah, You are Forgiving and love forgiveness, so forgive me.",
+      "bn": "হে আল্লাহ, আপনি ক্ষমাশীল এবং ক্ষমা ভালোবাসেন, তাই আমাকে ক্ষমা করুন।"
+    }
+  ],
+  "gratitude": [
+    {
+      "key": "dua-gratitude-01",
+      "titleEn": "Expressing gratitude",
+      "titleBn": "কৃতজ্ঞতা প্রকাশ করতে",
+      "arabic": "الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ",
+      "transliterationEn": "Al-hamdu lillahi Rabbi al-alamin",
+      "en": "All praise is due to Allah, Lord of the worlds.",
+      "bn": "সমস্ত প্রশংসা আল্লাহর জন্য, যিনি বিশ্বজগতের প্রভু।"
+    },
+    {
+      "key": "dua-gratitude-02",
+      "titleEn": "Thank you for blessings",
+      "titleBn": "আশীর্বাদের জন্য ধন্যবাদ",
+      "arabic": "اللَّهُمَّ اجْعَلْنِي أَشْكُرُ نِعْمَتَكَ",
+      "transliterationEn": "Allahumma ajalni ashkuru ni'mataka",
+      "en": "O Allah, make me grateful for Your blessings.",
+      "bn": "হে আল্লাহ, আমাকে আপনার নেয়ামতের জন্য কৃতজ্ঞ করুন।"
+    }
+  ],
+  "protection": [
+    {
+      "key": "dua-protection-01",
+      "titleEn": "Seeking Allah's protection",
+      "titleBn": "আল্লাহর সুরক্ষা চাওয়া",
+      "arabic": "أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ",
+      "transliterationEn": "Audhu billahi mina ash-shaytani ar-rajim",
+      "en": "I seek refuge in Allah from the accursed Satan.",
+      "bn": "আমি আল্লাহর কাছে অভিশপ্ত শয়তান থেকে আশ্রয় চাই।"
+    },
+    {
+      "key": "dua-protection-02",
+      "titleEn": "From evil",
+      "titleBn": "মন্দ থেকে সুরক্ষার জন্য",
+      "arabic": "أَعُوذُ بِكَ اللَّهُمَّ مِنَ السُّقْمِ وَالشَّرِّ",
+      "transliterationEn": "Audhu bika Allahumma min as-suqm wa ash-sharr",
+      "en": "O Allah, I seek refuge in You from illness and evil.",
+      "bn": "হে আল্লাহ, আমি অসুখ এবং মন্দ থেকে আপনার কাছে আশ্রয় চাই।"
+    }
+  ],
+  "forgiveness": [
+    {
+      "key": "dua-forgiveness-01",
+      "titleEn": "Seeking forgiveness",
+      "titleBn": "ক্ষমা চাওয়া",
+      "arabic": "أَسْتَغْفِرُ اللَّهَ الَّذِي لَا إِلٰهَ إِلَّا هُوَ الْعَلِيُّ الْعَظِيمُ",
+      "transliterationEn": "Astaghfiru Allaha alladhi la ilaha illa huwa al-Aliyyu al-Azim",
+      "en": "I seek forgiveness from Allah, there is no deity except Him, the Most High, the Most Great.",
+      "bn": "আমি আল্লাহর কাছে ক্ষমা চাই, তিনি ছাড়া কোনো ইলাহ নেই, তিনি সর্বোচ্চ, মহান।"
     }
   ]
 }

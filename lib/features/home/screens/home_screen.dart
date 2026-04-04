@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hijri_calendar/hijri_calendar.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/models/app_enums.dart';
 import '../../../core/services/location_service.dart';
@@ -8,7 +9,18 @@ import '../data/gentle_messages.dart';
 import '../../prayer/services/prayer_times.dart';
 import '../../prayer/services/prayer_times_service.dart';
 
-enum HomeQuickAction { qibla, quran, tasbih, halal, masjid, deenShiksha, hadith }
+enum HomeQuickAction {
+  qibla,
+  tasbih,
+  halal,
+  masjid,
+  nearestMosque,
+  deenShiksha,
+  hadith,
+  duas,
+  dhikr,
+  quran,
+}
 
 class HomeScreen extends StatefulWidget {
   final AppLanguage language;
@@ -97,21 +109,103 @@ class _HomeScreenState extends State<HomeScreen> {
     const labels = {
       'qibla_en': 'Qibla\nDirection',
       'qibla_bn': 'কিবলা\nদিক',
-      'quran_en': 'Qur\'an',
-      'quran_bn': 'কুরআন',
       'tasbih_en': 'Tasbih',
       'tasbih_bn': 'তাসবিহ',
       'halal_en': 'Halal\nGuide',
       'halal_bn': 'হালাল\nগাইড',
       'masjid_en': 'Find\nMasjid',
       'masjid_bn': 'মসজিদ\nখুঁজুন',
+      'nearestMosque_en': 'Nearest\nMosque',
+      'nearestMosque_bn': 'নিকটস্থ\nমসজিদ',
       'deen_en': 'Deen\nEducation',
       'deen_bn': 'দীন\nশিক্ষা',
       'hadith_en': 'Hadith',
       'hadith_bn': 'হাদিস',
+      'duas_en': 'Duas',
+      'duas_bn': 'দোয়া',
+      'dhikr_en': 'Dhikr',
+      'dhikr_bn': 'যিকির',
+      'quran_en': 'Quran',
+      'quran_bn': 'কুরআন',
     };
     final langSuffix = widget.language == AppLanguage.bn ? '_bn' : '_en';
     return labels['$key$langSuffix'] ?? '';
+  }
+
+  String _formatBengaliDate(DateTime date) {
+    const dayNamesBn = [
+      'সোমবার',
+      'মঙ্গলবার',
+      'বুধবার',
+      'বৃহস্পতিবার',
+      'শুক্রবার',
+      'শনিবার',
+      'রবিবার',
+    ];
+    const monthNamesBn = [
+      'জানুয়ারি',
+      'ফেব্রুয়ারি',
+      'মার্চ',
+      'এপ্রিল',
+      'মে',
+      'জুন',
+      'জুলাই',
+      'আগস্ট',
+      'সেপ্টেম্বর',
+      'অক্টোবর',
+      'নভেম্বর',
+      'ডিসেম্বর',
+    ];
+
+    final dayName = dayNamesBn[date.weekday - 1];
+    final monthName = monthNamesBn[date.month - 1];
+    return '$dayName, ${date.day} $monthName ${date.year}';
+  }
+
+  String _locationNameToBengali(String englishName) {
+    final locationMap = {
+      'Dhaka': 'ঢাকা',
+      'Chittagong': 'চট্টগ্রাম',
+      'Sylhet': 'সিলেট',
+      'Khulna': 'খুলনা',
+      'Rajshahi': 'রাজশাহী',
+      'Barisal': 'বরিশাল',
+      'Rangpur': 'রংপুর',
+      'Mymensingh': 'ময়মনসিংহ',
+      'Gazipur': 'গাজীপুর',
+      'Narayanganj': 'নারায়ণগঞ্জ',
+      'Tangail': 'টাঙ্গাইল',
+      'Comilla': 'কুমিল্লা',
+      'Jashore': 'যশোর',
+      'Bogra': 'বগুড়া',
+      'Dinajpur': 'দিনাজপুর',
+      'Pabna': 'পাবনা',
+      'Sirajganj': 'সিরাজগঞ্জ',
+      'Natore': 'নাটোর',
+      'Nawabganj': 'নবাবগঞ্জ',
+      'Kushtia': 'কুষ্টিয়া',
+      'Meherpur': 'মেহেরপুর',
+      'Chuadanga': 'চুয়াডাঙ্গা',
+      'Gopalganj': 'গোপালগঞ্জ',
+      'Pirojpur': 'পিরোজপুর',
+      'Jhalokathan': 'ঝালকাঠি',
+      'Patuakhali': 'পটুয়াখালী',
+      'Bhola': 'ভোলা',
+      'Feni': 'ফেনী',
+      'Noakhali': 'নোয়াখালী',
+      'Habiganj': 'হবিগঞ্জ',
+      'Moulvibazar': 'মৌলভীবাজার',
+      'Sunamganj': 'সুনামগঞ্জ',
+      'Nilphamari': 'নীলফামারী',
+      'Kurigram': 'কুড়িগ্রাম',
+      'Lalmonirhat': 'লালমনিরহাট',
+      'Thakurgaon': 'ঠাকুরগাঁও',
+      'Panchagarh': 'পঞ্চগড়',
+      'Jaypurhat': 'জয়পুরহাট',
+      'Sherpur': 'শেরপুর',
+    };
+
+    return locationMap[englishName] ?? englishName;
   }
 
   Future<PrayerTimesModel> _loadTimes() async {
@@ -127,8 +221,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final fetchedAt = DateTime.now();
     final (lat, lng) = await widget.locationService.getLatLngOrFallback();
     final name = await widget.locationService.getLiveLocationName();
-    final isFallback =
-        lat == LocationService.fallbackLat &&
+    final isFallback = lat == LocationService.fallbackLat &&
         lng == LocationService.fallbackLng;
     return _LocationSnapshot(
       name: name,
@@ -139,242 +232,216 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  String _relativeTime(DateTime time) {
-    final diff = DateTime.now().difference(time);
-    if (diff.inSeconds < 45) return 'just now';
-    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
-    if (diff.inHours < 24) return '${diff.inHours}h ago';
-    return '${diff.inDays}d ago';
+  Future<void> _openNearestMosque() async {
+    try {
+      final Uri url = Uri.parse(
+        'https://www.google.com/maps/search/?api=1&query=mosque+near+me',
+      );
+
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url, mode: LaunchMode.externalApplication);
+      }
+    } catch (e) {
+      // Fallback or error handling
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(widget.language == AppLanguage.bn
+                ? 'গুগল ম্যাপ খোলা যায়নি'
+                : 'Could not open Google Maps'),
+          ),
+        );
+      }
+    }
+  }
+
+  void _showRamadanCalendar() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => RamadanCalendarSheet(
+        language: widget.language,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
     final message = GentleMessages.dailyFor(widget.language, date: now);
-    final dateLabel = DateFormat('EEEE, d MMM y').format(now);
-    return SafeArea(
-      child: RefreshIndicator(
+
+    // Format date in Bengali or English based on language
+    final dateLabel = widget.language == AppLanguage.bn
+        ? _formatBengaliDate(now)
+        : DateFormat('EEEE, d MMM y').format(now);
+
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Scaffold(
+      body: RefreshIndicator(
         onRefresh: _onRefresh,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 10, 16, 24),
-          children: [
-            Container(
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [
-                    Color(0xFF0F2027),
-                    Color(0xFF203A43),
-                    Color(0xFF2C5364),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x330F2027),
-                    blurRadius: 22,
-                    offset: Offset(0, 12),
+        child: CustomScrollView(
+          slivers: [
+            // Modern Header
+            SliverAppBar(
+              expandedHeight: 280,
+              floating: false,
+              pinned: true,
+              elevation: 0,
+              backgroundColor: isDark ? const Color(0xFF0a0e27) : Colors.white,
+              flexibleSpace: FlexibleSpaceBar(
+                background: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: isDark
+                          ? const [
+                              Color(0xFF1a3a52),
+                              Color(0xFF0f2842),
+                              Color(0xFF081829),
+                            ]
+                          : const [
+                              Color(0xFF2563eb),
+                              Color(0xFF1d4ed8),
+                              Color(0xFF1e40af),
+                            ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
                   ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Column(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Top row: Salam greeting + icons
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // Salam Greeting
+                            Expanded(
+                              child: Text(
+                                widget.language == AppLanguage.bn
+                                    ? 'আসসালামু আলাইকুম'
+                                    : 'Assalamu Alaikum',
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.9),
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                            // Icons
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.12),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color:
+                                          Colors.white.withValues(alpha: 0.2),
+                                    ),
+                                  ),
+                                  child: InkWell(
+                                    onTap: widget.onOpenSettings,
+                                    child: const Icon(
+                                      Icons.settings_outlined,
+                                      color: Colors.white,
+                                      size: 20,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.12),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color:
+                                          Colors.white.withValues(alpha: 0.2),
+                                    ),
+                                  ),
+                                  child: InkWell(
+                                    onTap: widget.onOpenRamadan,
+                                    child: const Icon(
+                                      Icons.nightlight_round,
+                                      color: Colors.white,
+                                      size: 20,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        // Content
+                        Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               _greeting(),
-                              style: Theme.of(context).textTheme.titleMedium
-                                  ?.copyWith(color: Colors.white70),
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.85),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                letterSpacing: 0.5,
+                              ),
                             ),
-                            const SizedBox(height: 6),
+                            const SizedBox(height: 8),
                             Text(
                               widget.language == AppLanguage.bn
-                                  ? 'আসসালামু আলাইকুম'
-                                  : 'Assalamu Alaikum',
-                              style: Theme.of(context).textTheme.headlineSmall
-                                  ?.copyWith(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                            ),
-                            const SizedBox(height: 10),
-                            Text(
-                              dateLabel,
+                                  ? 'আপনার ইসলামিক যাত্রা'
+                                  : 'Your Islamic Journey',
                               style: const TextStyle(
-                                color: Colors.white70,
-                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                                height: 1.2,
+                                letterSpacing: -0.5,
                               ),
                             ),
-                            const SizedBox(height: 2),
-                            Text(
-                              _hijriDate(),
-                              style: const TextStyle(color: Colors.white60),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Column(
-                        children: [
-                          Material(
-                            color: Colors.white.withValues(alpha: 0.08),
-                            borderRadius: BorderRadius.circular(14),
-                            child: InkWell(
-                              onTap: widget.onOpenRamadan,
-                              borderRadius: BorderRadius.circular(14),
-                              child: const Padding(
-                                padding: EdgeInsets.all(8),
-                                child: Icon(
-                                  Icons.nightlight_round,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Material(
-                            color: Colors.white.withValues(alpha: 0.08),
-                            borderRadius: BorderRadius.circular(14),
-                            child: InkWell(
-                              onTap: widget.onOpenSettings,
-                              borderRadius: BorderRadius.circular(14),
-                              child: const Padding(
-                                padding: EdgeInsets.all(8),
-                                child: Icon(
-                                  Icons.settings_outlined,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 18),
-                  FutureBuilder<_LocationSnapshot>(
-                    future: _locationFuture,
-                    builder: (context, snapshot) {
-                      final data = snapshot.data;
-                      final loading = !snapshot.hasData;
-                      final title =
-                          data?.name ??
-                          (widget.language == AppLanguage.bn
-                              ? 'লাইভ লোকেশন লোড হচ্ছে...'
-                              : 'Loading live location...');
-                      final coords = data == null
-                          ? '—'
-                          : '${data.lat.toStringAsFixed(4)}, ${data.lng.toStringAsFixed(4)}';
-                      final status = data == null
-                          ? (widget.language == AppLanguage.bn
-                                ? 'রিয়েলটাইম অবস্থান আনছি'
-                                : 'Fetching live coordinates')
-                          : data.isFallback
-                          ? (widget.language == AppLanguage.bn
-                                ? 'ডিফল্ট ঢাকা, বাংলাদেশ'
-                                : 'Fallback: Dhaka, Bangladesh')
-                          : (widget.language == AppLanguage.bn
-                                ? 'লাইভ আপডেট ' + _relativeTime(data.fetchedAt)
-                                : 'Live update ' +
-                                      _relativeTime(data.fetchedAt));
-
-                      return Container(
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.08),
-                          borderRadius: BorderRadius.circular(18),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.15),
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
+                            const SizedBox(height: 16),
                             Row(
                               children: [
-                                Container(
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    gradient: const LinearGradient(
-                                      colors: [
-                                        Color(0xFFA0F1D1),
-                                        Color(0xFF37C978),
-                                      ],
-                                    ),
-                                  ),
-                                  child: const Icon(
-                                    Icons.gps_fixed,
-                                    color: Color(0xFF0F2027),
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
                                 Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        title,
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        coords,
-                                        style: const TextStyle(
-                                          color: Colors.white70,
-                                          fontSize: 13,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                AnimatedOpacity(
-                                  duration: const Duration(milliseconds: 250),
-                                  opacity: loading ? 0.5 : 1,
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 8,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(14),
-                                      color: Colors.white.withValues(
-                                        alpha: 0.12,
-                                      ),
-                                    ),
-                                    child: Row(
+                                  child: GestureDetector(
+                                    onTap: _showRamadanCalendar,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        const Icon(
-                                          Icons.wifi_tethering,
-                                          color: Colors.white,
-                                          size: 16,
+                                        Row(
+                                          children: [
+                                            Text(
+                                              dateLabel,
+                                              style: TextStyle(
+                                                color: Colors.white
+                                                    .withValues(alpha: 0.8),
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 6),
+                                            Icon(
+                                              Icons.calendar_today_outlined,
+                                              color: Colors.white
+                                                  .withValues(alpha: 0.7),
+                                              size: 13,
+                                            ),
+                                          ],
                                         ),
-                                        const SizedBox(width: 6),
+                                        const SizedBox(height: 4),
                                         Text(
-                                          loading
-                                              ? (widget.language ==
-                                                        AppLanguage.bn
-                                                    ? 'সিঙ্ক হচ্ছে'
-                                                    : 'Syncing')
-                                              : (widget.language ==
-                                                        AppLanguage.bn
-                                                    ? 'লাইভ'
-                                                    : 'Live'),
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w700,
+                                          _hijriDate(),
+                                          style: TextStyle(
+                                            color: Colors.white
+                                                .withValues(alpha: 0.65),
+                                            fontSize: 12,
                                           ),
                                         ),
                                       ],
@@ -383,195 +450,407 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 8),
-                            Text(
-                              status,
-                              style: const TextStyle(
-                                color: Colors.white70,
-                                fontSize: 12,
-                              ),
-                            ),
                           ],
                         ),
-                      );
-                    },
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.notifications_active_outlined,
-                              color: Color(0xFFA0F1D1),
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              widget.language == AppLanguage.bn
-                                  ? 'সালাত অ্যালার্ম'
-                                  : 'Salat Alarm',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Switch.adaptive(
-                        value: widget.alarmEnabled,
-                        activeTrackColor: const Color(0xFFA0F1D1),
-                        activeColor: const Color(0xFF1A1C30),
-                        inactiveTrackColor: Colors.white24,
-                        onChanged: widget.onAlarmToggle,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 14),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-              decoration: BoxDecoration(
-                color: const Color(0xFF22925D),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                message,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
-            const SizedBox(height: 14),
-            FutureBuilder<PrayerTimesModel>(
-              future: _prayerFuture,
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                final times = snapshot.data!;
-                
-                // Check if it's Ramadan
-                final hijri = HijriCalendarConfig.now();
-                final isRamadan = hijri.hMonth == 9; // Ramadan is month 9
 
-                return Column(
+            // Main Content
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _SehriIftarCard(
-                      language: widget.language,
-                      fajrTime: times.fajr,
-                      maghribTime: times.maghrib,
-                      isRamadan: isRamadan,
-                    ),
-                    const SizedBox(height: 12),
-                    _ForbiddenPrayerTimesCard(
-                      language: widget.language,
-                      fajr: times.fajr,
-                      dhuhr: times.dhuhr,
-                      maghrib: times.maghrib,
+                    // Location Card
+                    FutureBuilder<_LocationSnapshot>(
+                      future: _locationFuture,
+                      builder: (context, snapshot) {
+                        final data = snapshot.data;
+                        final loading = !snapshot.hasData;
+                        final locationName = data?.name ?? '';
+                        final title = (locationName.isEmpty)
+                            ? (widget.language == AppLanguage.bn
+                                ? 'লোড হচ্ছে...'
+                                : 'Loading...')
+                            : (widget.language == AppLanguage.bn
+                                ? _locationNameToBengali(locationName)
+                                : locationName);
+                        final coords = data == null
+                            ? '—'
+                            : '${data.lat.toStringAsFixed(2)}°, ${data.lng.toStringAsFixed(2)}°';
+
+                        return Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? const Color(0xFF1a2a3f).withValues(alpha: 0.6)
+                                : const Color(0xFFeff6ff)
+                                    .withValues(alpha: 0.8),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: isDark
+                                  ? Colors.white.withValues(alpha: 0.1)
+                                  : const Color(0xFF2563eb)
+                                      .withValues(alpha: 0.2),
+                              width: 1.5,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF2563eb)
+                                    .withValues(alpha: 0.1),
+                                blurRadius: 20,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      gradient: const LinearGradient(
+                                        colors: [
+                                          Color(0xFF06b6d4),
+                                          Color(0xFF0891b2)
+                                        ],
+                                      ),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: const Icon(
+                                      Icons.location_on,
+                                      color: Colors.white,
+                                      size: 20,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      widget.language == AppLanguage.bn
+                                          ? 'আমার অবস্থান'
+                                          : 'My Location',
+                                      style: TextStyle(
+                                        color: isDark
+                                            ? Colors.white70
+                                            : const Color(0xFF4a4a5a),
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
+                                  if (loading)
+                                    SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor: AlwaysStoppedAnimation(
+                                          isDark
+                                              ? Colors.white
+                                              : const Color(0xFF2563eb),
+                                        ),
+                                      ),
+                                    )
+                                  else
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF10b981)
+                                            .withValues(alpha: 0.15),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Text(
+                                        widget.language == AppLanguage.bn
+                                            ? 'লাইভ'
+                                            : 'Live',
+                                        style: const TextStyle(
+                                          color: Color(0xFF10b981),
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    title,
+                                    style: TextStyle(
+                                      color: isDark
+                                          ? Colors.white
+                                          : const Color(0xFF1a1a2e),
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    coords,
+                                    style: TextStyle(
+                                      color: isDark
+                                          ? Colors.white.withValues(alpha: 0.6)
+                                          : const Color(0xFF4a4a5a),
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
                     const SizedBox(height: 16),
-                    _PrayerTimesCard(
-                      language: widget.language,
-                      times: times,
+
+                    // Salat Alarm Card
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? const Color(0xFF1a2a3f).withValues(alpha: 0.6)
+                            : const Color(0xFFfef3c7).withValues(alpha: 0.7),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.1)
+                              : const Color(0xFFfbbf24).withValues(alpha: 0.3),
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFf59e0b)
+                                  .withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(
+                              Icons.notifications_active,
+                              color: Color(0xFFf59e0b),
+                              size: 18,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  widget.language == AppLanguage.bn
+                                      ? 'সালাত অ্যালার্ম'
+                                      : 'Salat Alarm',
+                                  style: TextStyle(
+                                    color: isDark
+                                        ? Colors.white
+                                        : const Color(0xFF1a1a2e),
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  widget.alarmEnabled
+                                      ? (widget.language == AppLanguage.bn
+                                          ? 'চালু'
+                                          : 'Enabled')
+                                      : (widget.language == AppLanguage.bn
+                                          ? 'বন্ধ'
+                                          : 'Disabled'),
+                                  style: TextStyle(
+                                    color: isDark
+                                        ? Colors.white.withValues(alpha: 0.6)
+                                        : const Color(0xFF4a4a5a),
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Switch.adaptive(
+                            value: widget.alarmEnabled,
+                            activeColor: const Color(0xFFf59e0b),
+                            onChanged: widget.onAlarmToggle,
+                          ),
+                        ],
+                      ),
                     ),
+                    const SizedBox(height: 16),
+
+                    // Prayer Times Card
+                    FutureBuilder<PrayerTimesModel>(
+                      future: _prayerFuture,
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return Center(
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation(
+                                isDark ? Colors.white : const Color(0xFF2563eb),
+                              ),
+                            ),
+                          );
+                        }
+                        final times = snapshot.data!;
+                        return Column(
+                          children: [
+                            _PrayerTimesCard(
+                              language: widget.language,
+                              times: times,
+                            ),
+                            const SizedBox(height: 16),
+                            _ForbiddenPrayerTimesCard(
+                              language: widget.language,
+                              fajr: times.fajr,
+                              dhuhr: times.dhuhr,
+                              maghrib: times.maghrib,
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Motivational Card
+                    Container(
+                      padding: const EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: const [
+                            Color(0xFF9333ea),
+                            Color(0xFF7e22ce),
+                            Color(0xFF6b21a8),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color:
+                                const Color(0xFF9333ea).withValues(alpha: 0.3),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
+                      ),
+                      child: Text(
+                        message,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          height: 1.6,
+                          letterSpacing: 0.2,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Quick Access Header
+                    Text(
+                      widget.language == AppLanguage.bn
+                          ? 'দ্রুত অ্যাক্সেস'
+                          : 'Quick Access',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : const Color(0xFF1a1a2e),
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
                   ],
-                );
-              },
+                ),
+              ),
             ),
-            const SizedBox(height: 20),
-            Text(
-              widget.language == AppLanguage.bn ? 'দ্রুত অ্যাক্সেস' : 'Quick Access',
-              style: Theme.of(
-                context,
-              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
+
+            // Quick Access Grid
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              sliver: SliverGrid(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  childAspectRatio: 0.85,
+                ),
+                delegate: SliverChildListDelegate([
+                  _QuickAccessButton(
+                    icon: Icons.explore_outlined,
+                    label: _quickAccessLabel('qibla'),
+                    gradient: const [Color(0xFF06b6d4), Color(0xFF0891b2)],
+                    onTap: () => widget.onQuickAccessTap(HomeQuickAction.qibla),
+                  ),
+                  _QuickAccessButton(
+                    icon: Icons.self_improvement_outlined,
+                    label: _quickAccessLabel('tasbih'),
+                    gradient: const [Color(0xFF8b5cf6), Color(0xFF7c3aed)],
+                    onTap: () =>
+                        widget.onQuickAccessTap(HomeQuickAction.tasbih),
+                  ),
+                  _QuickAccessButton(
+                    icon: Icons.restaurant_menu_outlined,
+                    label: _quickAccessLabel('halal'),
+                    gradient: const [Color(0xFFec4899), Color(0xFFdb2777)],
+                    onTap: () => widget.onQuickAccessTap(HomeQuickAction.halal),
+                  ),
+                  _QuickAccessButton(
+                    icon: Icons.map_outlined,
+                    label: _quickAccessLabel('nearestMosque'),
+                    gradient: const [Color(0xFFf59e0b), Color(0xFFd97706)],
+                    onTap: _openNearestMosque,
+                  ),
+                  _QuickAccessButton(
+                    icon: Icons.school_outlined,
+                    label: _quickAccessLabel('deen'),
+                    gradient: const [Color(0xFF06b6d4), Color(0xFF0d9488)],
+                    onTap: () =>
+                        widget.onQuickAccessTap(HomeQuickAction.deenShiksha),
+                  ),
+                  _QuickAccessButton(
+                    icon: Icons.book_outlined,
+                    label: _quickAccessLabel('hadith'),
+                    gradient: const [Color(0xFF10b981), Color(0xFF059669)],
+                    onTap: () =>
+                        widget.onQuickAccessTap(HomeQuickAction.hadith),
+                  ),
+                  _QuickAccessButton(
+                    icon: Icons.favorite_outline,
+                    label: _quickAccessLabel('duas'),
+                    gradient: const [Color(0xFFef4444), Color(0xFFdc2626)],
+                    onTap: () => widget.onQuickAccessTap(HomeQuickAction.duas),
+                  ),
+                  _QuickAccessButton(
+                    icon: Icons.handshake_outlined,
+                    label: _quickAccessLabel('dhikr'),
+                    gradient: const [Color(0xFF14b8a6), Color(0xFF0d9488)],
+                    onTap: () => widget.onQuickAccessTap(HomeQuickAction.dhikr),
+                  ),
+                  _QuickAccessButton(
+                    icon: Icons.menu_book_outlined,
+                    label: _quickAccessLabel('quran'),
+                    gradient: const [Color(0xFF2563eb), Color(0xFF1d4ed8)],
+                    onTap: () => widget.onQuickAccessTap(HomeQuickAction.quran),
+                  ),
+                ]),
+              ),
             ),
-            const SizedBox(height: 12),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                // Responsive grid sizing to avoid overflow on narrow screens.
-                final width = constraints.maxWidth;
-                const spacing = 12.0;
-                const maxTileWidth = 160.0;
-                final crossAxisCount = (width / (maxTileWidth + spacing))
-                    .floor()
-                    .clamp(2, 4);
-                final tileWidth =
-                    (width - spacing * (crossAxisCount - 1)) / crossAxisCount;
-                const tileHeight = 118.0;
-                final ratio = tileWidth / tileHeight;
-                return GridView.count(
-                  crossAxisCount: crossAxisCount,
-                  crossAxisSpacing: spacing,
-                  mainAxisSpacing: spacing,
-                  childAspectRatio: ratio,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  children: [
-                    _QuickItem(
-                      icon: Icons.explore_outlined,
-                      label: _quickAccessLabel('qibla'),
-                      bg: const Color(0xFFE3ECE6),
-                      fg: const Color(0xFF1D7E53),
-                      onTap: () =>
-                          widget.onQuickAccessTap(HomeQuickAction.qibla),
-                    ),
-                    _QuickItem(
-                      icon: Icons.menu_book_outlined,
-                      label: _quickAccessLabel('quran'),
-                      bg: const Color(0xFFF7F0DD),
-                      fg: const Color(0xFFC7A452),
-                      onTap: () =>
-                          widget.onQuickAccessTap(HomeQuickAction.quran),
-                    ),
-                    _QuickItem(
-                      icon: Icons.self_improvement_outlined,
-                      label: _quickAccessLabel('tasbih'),
-                      bg: const Color(0xFFE9E9EE),
-                      fg: const Color(0xFF1A1C30),
-                      onTap: () =>
-                          widget.onQuickAccessTap(HomeQuickAction.tasbih),
-                    ),
-                    _QuickItem(
-                      icon: Icons.restaurant_menu_outlined,
-                      label: _quickAccessLabel('halal'),
-                      bg: const Color(0xFFE3ECE6),
-                      fg: const Color(0xFF1D7E53),
-                      onTap: () =>
-                          widget.onQuickAccessTap(HomeQuickAction.halal),
-                    ),
-                    _QuickItem(
-                      icon: Icons.location_on_outlined,
-                      label: _quickAccessLabel('masjid'),
-                      bg: const Color(0xFFF3E5D8),
-                      fg: const Color(0xFFA0704D),
-                      onTap: () =>
-                          widget.onQuickAccessTap(HomeQuickAction.masjid),
-                    ),
-                    _QuickItem(
-                      icon: Icons.school_outlined,
-                      label: _quickAccessLabel('deen'),
-                      bg: const Color(0xFFF0E4FF),
-                      fg: const Color(0xFF7C3AED),
-                      onTap: () =>
-                          widget.onQuickAccessTap(HomeQuickAction.deenShiksha),
-                    ),
-                    _QuickItem(
-                      icon: Icons.book_outlined,
-                      label: _quickAccessLabel('hadith'),
-                      bg: const Color(0xFFE8F5E9),
-                      fg: const Color(0xFF2E7D32),
-                      onTap: () =>
-                          widget.onQuickAccessTap(HomeQuickAction.hadith),
-                    ),
-                  ],
-                );
-              },
+
+            SliverToBoxAdapter(
+              child: const SizedBox(height: 20),
             ),
           ],
         ),
@@ -607,77 +886,153 @@ class _PrayerTimesCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = [
-      (label: 'Fajr', bn: 'ফজর', time: times.fajr),
-      (label: 'Zuhr', bn: 'যোহর', time: times.dhuhr),
-      (label: 'Asr', bn: 'আসর', time: times.asr),
-      (label: 'Maghrib', bn: 'মাগরিব', time: times.maghrib),
-      (label: 'Isha', bn: 'এশা', time: times.isha),
+      (label: 'Fajr', bn: 'ফজর', start: times.fajr),
+      (label: 'Zuhr', bn: 'যোহর', start: times.dhuhr),
+      (label: 'Asr', bn: 'আসর', start: times.asr),
+      (label: 'Maghrib', bn: 'মাগরিব', start: times.maghrib),
+      (label: 'Isha', bn: 'এশা', start: times.isha),
     ];
-    return StreamBuilder<int>(
-      stream: Stream.periodic(const Duration(minutes: 1), (x) => x),
-      builder: (context, _) {
-        final now = DateTime.now();
-        final next = items.firstWhere(
-          (p) => p.time.isAfter(now),
-          orElse: () => items.first,
-        );
-        final left = next.time.difference(now);
-        return Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(22),
-            gradient: const LinearGradient(
-              colors: [Color(0xFF143368), Color(0xFF3B5E97)],
-            ),
+
+    final now = DateTime.now();
+    final next = items.firstWhere(
+      (p) => p.start.isAfter(now),
+      orElse: () => items.first,
+    );
+    final left = next.start.difference(now);
+
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: const [
+            Color(0xFF06b6d4),
+            Color(0xFF0891b2),
+            Color(0xFF0d9488),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF06b6d4).withValues(alpha: 0.35),
+            blurRadius: 24,
+            offset: const Offset(0, 10),
+            spreadRadius: 2,
           ),
-          child: Row(
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
             children: [
-              const Icon(
-                Icons.wb_twilight_rounded,
-                color: Colors.white,
-                size: 40,
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.schedule,
+                  color: Colors.white,
+                  size: 24,
+                ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       language == AppLanguage.bn
-                          ? 'পরবর্তী নামাজ'
+                          ? 'পরবর্তী সালাত'
                           : 'Next Prayer',
-                      style: const TextStyle(color: Colors.white70),
-                    ),
-                    Text(
-                      next.label,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 36,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.8),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
+                    const SizedBox(height: 4),
                     Text(
-                      _format(next.time),
+                      language == AppLanguage.bn ? next.bn : next.label,
                       style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 18,
+                        color: Colors.white,
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        height: 1,
                       ),
                     ),
                   ],
                 ),
               ),
-              Text(
-                '${left.inHours}h ${left.inMinutes.remainder(60)}m\n${language == AppLanguage.bn ? 'বাকি' : 'remaining'}',
-                textAlign: TextAlign.right,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    '${left.inHours}h',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    '${left.inMinutes.remainder(60)}m',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.8),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        );
-      },
+          const SizedBox(height: 14),
+          Container(
+            height: 1,
+            color: Colors.white.withValues(alpha: 0.15),
+          ),
+          const SizedBox(height: 14),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: items
+                  .map(
+                    (prayer) => Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Column(
+                        children: [
+                          Text(
+                            language == AppLanguage.bn
+                                ? prayer.bn
+                                : prayer.label,
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.7),
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            _format(prayer.start),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -716,23 +1071,24 @@ class _QuickItemState extends State<_QuickItem> {
         onTapUp: (_) => setState(() => _pressed = false),
         child: AnimatedScale(
           duration: const Duration(milliseconds: 140),
-          scale: _pressed ? 0.96 : 1,
+          scale: _pressed ? 0.94 : (active ? 1.02 : 1),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 220),
             curve: Curves.easeOutCubic,
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: Color.lerp(
-                widget.bg,
-                widget.fg.withValues(alpha: 0.16),
-                active ? 1 : 0,
+              color: widget.bg,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: widget.fg.withValues(alpha: 0.15),
+                width: 1.5,
               ),
-              borderRadius: BorderRadius.circular(18),
               boxShadow: [
                 BoxShadow(
-                  color: widget.fg.withValues(alpha: active ? 0.25 : 0.08),
-                  blurRadius: active ? 18 : 10,
-                  offset: Offset(0, active ? 8 : 4),
+                  color: widget.fg.withValues(alpha: active ? 0.3 : 0.12),
+                  blurRadius: active ? 20 : 12,
+                  offset: Offset(0, active ? 10 : 6),
+                  spreadRadius: active ? 1 : 0,
                 ),
               ],
             ),
@@ -740,22 +1096,38 @@ class _QuickItemState extends State<_QuickItem> {
               color: Colors.transparent,
               child: InkWell(
                 onTap: widget.onTap,
-                borderRadius: BorderRadius.circular(18),
-                splashColor: widget.fg.withValues(alpha: 0.18),
-                highlightColor: widget.fg.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(20),
+                splashColor: widget.fg.withValues(alpha: 0.15),
+                highlightColor: Colors.transparent,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     AnimatedScale(
                       duration: const Duration(milliseconds: 180),
-                      scale: active ? 1.08 : 1,
-                      child: Icon(widget.icon, color: widget.fg, size: 28),
+                      scale: active ? 1.12 : 1,
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: widget.fg.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(
+                          widget.icon,
+                          color: widget.fg,
+                          size: 28,
+                        ),
+                      ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 10),
                     Text(
                       widget.label,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(fontWeight: FontWeight.w700),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        color: widget.fg,
+                        fontSize: 13,
+                        height: 1.3,
+                      ),
                     ),
                   ],
                 ),
@@ -764,190 +1136,6 @@ class _QuickItemState extends State<_QuickItem> {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _SehriIftarCard extends StatelessWidget {
-  final AppLanguage language;
-  final DateTime fajrTime;
-  final DateTime maghribTime;
-  final bool isRamadan;
-
-  const _SehriIftarCard({
-    required this.language,
-    required this.fajrTime,
-    required this.maghribTime,
-    required this.isRamadan,
-  });
-
-  String _format(DateTime dt) => DateFormat.jm().format(dt);
-
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<int>(
-      stream: Stream.periodic(const Duration(minutes: 1), (x) => x),
-      builder: (context, _) {
-        final now = DateTime.now();
-        
-        // Calculate time until Sehri (Fajr) and time until Iftar (Maghrib)
-        final sehriLeft = fajrTime.difference(now);
-        final iftarLeft = maghribTime.difference(now);
-        
-        // Determine which one is next
-        final isSehriNext = sehriLeft.isNegative == false && 
-                           (iftarLeft.isNegative || sehriLeft < iftarLeft);
-        
-        return Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(22),
-            gradient: const LinearGradient(
-              colors: [Color(0xFF8B2635), Color(0xFFC23B57)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  const Icon(
-                    Icons.nightlife,
-                    color: Colors.white,
-                    size: 40,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          isRamadan
-                              ? (language == AppLanguage.bn
-                                  ? 'রমজান - সেহরি ও ইফতার'
-                                  : 'Ramadan - Sehri & Iftar')
-                              : (language == AppLanguage.bn
-                                  ? 'সেহরি ও ইফতার'
-                                  : 'Sehri & Iftar'),
-                          style: const TextStyle(
-                            color: Colors.white70,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          language == AppLanguage.bn ? 'সেহরির সময়' : 'Sehri Time',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w800,
-                            fontSize: 14,
-                          ),
-                        ),
-                        Text(
-                          _format(fajrTime),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              const Divider(color: Colors.white24),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  const Icon(
-                    Icons.wb_sunny,
-                    color: Color(0xFFFFD700),
-                    size: 40,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          language == AppLanguage.bn
-                              ? 'ইফতারের সময়'
-                              : 'Iftar Time',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w800,
-                            fontSize: 14,
-                          ),
-                        ),
-                        Text(
-                          _format(maghribTime),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (isSehriNext)
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            '${sehriLeft.inHours}h',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 16,
-                            ),
-                          ),
-                          Text(
-                            language == AppLanguage.bn ? 'বাকি' : 'left',
-                            style: const TextStyle(
-                              color: Colors.white70,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  else
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            '${iftarLeft.inHours}h',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 16,
-                            ),
-                          ),
-                          Text(
-                            language == AppLanguage.bn ? 'বাকি' : 'left',
-                            style: const TextStyle(
-                              color: Colors.white70,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                ],
-              ),
-            ],
-          ),
-        );
-      },
     );
   }
 }
@@ -983,14 +1171,22 @@ class _ForbiddenPrayerTimesCard extends StatelessWidget {
     final ghuruubEnd = maghrib.add(const Duration(minutes: 20));
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(24),
         gradient: const LinearGradient(
           colors: [Color(0xFF6B4C9A), Color(0xFF9B6FA8)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF6B4C9A).withValues(alpha: 0.3),
+            blurRadius: 24,
+            offset: const Offset(0, 10),
+            spreadRadius: 2,
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1029,7 +1225,8 @@ class _ForbiddenPrayerTimesCard extends StatelessWidget {
           // Zawal
           _ForbiddenTimeRow(
             language: language,
-            label: language == AppLanguage.bn ? 'যোহরের সময়' : 'Zawal (Midday)',
+            label:
+                language == AppLanguage.bn ? 'যোহরের সময়' : 'Zawal (Midday)',
             start: _format(zawalStart),
             end: _format(zawalEnd),
           ),
@@ -1037,7 +1234,8 @@ class _ForbiddenPrayerTimesCard extends StatelessWidget {
           // Ghuruub
           _ForbiddenTimeRow(
             language: language,
-            label: language == AppLanguage.bn ? 'সূর্যাস্তের পর' : 'After Sunset',
+            label:
+                language == AppLanguage.bn ? 'সূর্যাস্তের পর' : 'After Sunset',
             start: _format(ghuruubStart),
             end: _format(ghuruubEnd),
           ),
@@ -1099,6 +1297,555 @@ class _ForbiddenTimeRow extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+// Ramadan Calendar Sheet Widget
+class RamadanCalendarSheet extends StatefulWidget {
+  final AppLanguage language;
+  const RamadanCalendarSheet({required this.language});
+
+  @override
+  State<RamadanCalendarSheet> createState() => _RamadanCalendarSheetState();
+}
+
+class _RamadanCalendarSheetState extends State<RamadanCalendarSheet> {
+  late int _ramadanYear;
+
+  @override
+  void initState() {
+    super.initState();
+    final hijri = HijriCalendarConfig.now();
+    _ramadanYear = hijri.hYear;
+  }
+
+  String _monthName(int month) {
+    const monthsEn = [
+      'Muharram',
+      'Safar',
+      'Rabi al-Awwal',
+      'Rabi al-Thani',
+      'Jumada al-Awwal',
+      'Jumada al-Thani',
+      'Rajab',
+      'Sha\'ban',
+      'Ramadan',
+      'Shawwal',
+      'Dhul Qa\'dah',
+      'Dhul Hijjah',
+    ];
+    const monthsBn = [
+      'মুহাররম',
+      'সফর',
+      'রবিউল আউয়াল',
+      'রবিউল থানি',
+      'জুমাদা উল আউয়াল',
+      'জুমাদা উল থানি',
+      'রজব',
+      'শা\'বান',
+      'রমজান',
+      'শাওয়াল',
+      'ধুল-কা\'দাহ',
+      'ধুল-হিজ্জাহ',
+    ];
+
+    if (widget.language == AppLanguage.bn) {
+      return monthsBn[(month - 1).clamp(0, 11)];
+    }
+    return monthsEn[(month - 1).clamp(0, 11)];
+  }
+
+  String _dayName(int dayNo) {
+    const daysEn = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const daysBn = ['রবি', 'সোম', 'মঙ্গল', 'বুধ', 'বৃহ', 'শুক্র', 'শনি'];
+
+    if (widget.language == AppLanguage.bn) {
+      return daysBn[dayNo];
+    }
+    return daysEn[dayNo];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final hijri = HijriCalendarConfig.now();
+    final isRamadan = hijri.hMonth == 9;
+
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      child: DraggableScrollableSheet(
+        initialChildSize: 0.85,
+        minChildSize: 0.5,
+        maxChildSize: 1,
+        expand: false,
+        builder: (context, scrollController) {
+          return SingleChildScrollView(
+            controller: scrollController,
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        widget.language == AppLanguage.bn
+                            ? 'ইসলামিক ক্যালেন্ডার'
+                            : 'Islamic Calendar',
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      Material(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(12),
+                        child: InkWell(
+                          onTap: () => Navigator.pop(context),
+                          borderRadius: BorderRadius.circular(12),
+                          child: const Padding(
+                            padding: EdgeInsets.all(8),
+                            child: Icon(Icons.close),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Hijri Date Info
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [
+                          Color(0xFF8B2635),
+                          Color(0xFFC23B57),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.language == AppLanguage.bn
+                              ? 'আজকের হিজরি তারিখ'
+                              : 'Today\'s Hijri Date',
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '${hijri.hDay} ${_monthName(hijri.hMonth)} ${hijri.hYear} AH',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            if (isRamadan)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.2),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.nightlight_round,
+                                      color: Colors.white,
+                                      size: 16,
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      widget.language == AppLanguage.bn
+                                          ? 'রমজান চলছে'
+                                          : 'Ramadan is here',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Ramadan Calendar Year
+                  Text(
+                    widget.language == AppLanguage.bn
+                        ? 'রমজানের দিন (${_ramadanYear}H)'
+                        : 'Days of Ramadan (${_ramadanYear}H)',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Weekday Headers
+                  Row(
+                    children: List.generate(
+                      7,
+                      (index) => Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Center(
+                            child: Text(
+                              _dayName(index),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Calendar Grid
+                  Column(
+                    children: [
+                      for (int week = 0; week < 6; week++)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Row(
+                            children: List.generate(
+                              7,
+                              (dayIndex) {
+                                final cellIndex = week * 7 + dayIndex;
+                                final day = cellIndex < 7
+                                    ? null
+                                    : (cellIndex - 7 < 30
+                                        ? cellIndex - 6
+                                        : null);
+
+                                if (day == null) {
+                                  return Expanded(
+                                    child: Container(),
+                                  );
+                                }
+
+                                final isToday = hijri.hDay == day &&
+                                    hijri.hMonth == 9 &&
+                                    hijri.hYear == _ramadanYear;
+
+                                return Expanded(
+                                  child: Container(
+                                    height: 50,
+                                    decoration: BoxDecoration(
+                                      color: isToday
+                                          ? const Color(0xFF8B2635)
+                                          : (day == 1 || day == 27 || day == 30
+                                              ? Colors.orange[100]
+                                              : Colors.grey[100]),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: isToday
+                                          ? Border.all(
+                                              color: const Color(0xFFC23B57),
+                                              width: 2,
+                                            )
+                                          : null,
+                                    ),
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        onTap: () {
+                                          // Handle day tap if needed
+                                        },
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: Center(
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                '$day',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.w800,
+                                                  fontSize: 16,
+                                                  color: isToday
+                                                      ? Colors.white
+                                                      : Colors.black,
+                                                ),
+                                              ),
+                                              if (day == 1)
+                                                Text(
+                                                  widget.language ==
+                                                          AppLanguage.bn
+                                                      ? 'শুরু'
+                                                      : 'Start',
+                                                  style: TextStyle(
+                                                    fontSize: 10,
+                                                    color: Colors.red,
+                                                    fontWeight: FontWeight.w700,
+                                                  ),
+                                                ),
+                                              if (day == 27)
+                                                Text(
+                                                  widget.language ==
+                                                          AppLanguage.bn
+                                                      ? 'লাইল'
+                                                      : 'Lail',
+                                                  style: TextStyle(
+                                                    fontSize: 10,
+                                                    color: Colors.blue,
+                                                    fontWeight: FontWeight.w700,
+                                                  ),
+                                                ),
+                                              if (day == 30)
+                                                Text(
+                                                  widget.language ==
+                                                          AppLanguage.bn
+                                                      ? 'শেষ'
+                                                      : 'End',
+                                                  style: TextStyle(
+                                                    fontSize: 10,
+                                                    color: Colors.green,
+                                                    fontWeight: FontWeight.w700,
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Legend
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.language == AppLanguage.bn
+                              ? 'গুরুত্বপূর্ণ দিন'
+                              : 'Important Days',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 14,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        _LegendItem(
+                          language: widget.language,
+                          color: Colors.orange,
+                          label: widget.language == AppLanguage.bn
+                              ? 'বিশেষ দিন (শুরু, লাইলাতুল কদর, শেষ)'
+                              : 'Special Days (Start, Lailat al-Qadr, End)',
+                        ),
+                        const SizedBox(height: 8),
+                        _LegendItem(
+                          language: widget.language,
+                          color: const Color(0xFF8B2635),
+                          label: widget.language == AppLanguage.bn
+                              ? 'আজকের দিন'
+                              : 'Today',
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _LegendItem extends StatelessWidget {
+  final AppLanguage language;
+  final Color color;
+  final String label;
+
+  const _LegendItem({
+    required this.language,
+    required this.color,
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 20,
+          height: 20,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(6),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontSize: 12,
+              color: Colors.black87,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// New Modern Quick Access Button
+class _QuickAccessButton extends StatefulWidget {
+  final IconData icon;
+  final String label;
+  final List<Color> gradient;
+  final VoidCallback onTap;
+
+  const _QuickAccessButton({
+    required this.icon,
+    required this.label,
+    required this.gradient,
+    required this.onTap,
+  });
+
+  @override
+  State<_QuickAccessButton> createState() => _QuickAccessButtonState();
+}
+
+class _QuickAccessButtonState extends State<_QuickAccessButton>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  bool _isPressed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) {
+        setState(() => _isPressed = true);
+        _controller.forward();
+      },
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
+        _controller.reverse();
+        widget.onTap();
+      },
+      onTapCancel: () {
+        setState(() => _isPressed = false);
+        _controller.reverse();
+      },
+      child: AnimatedScale(
+        scale: _isPressed ? 0.92 : 1.0,
+        duration: const Duration(milliseconds: 200),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: widget.gradient,
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: widget.gradient[0].withValues(alpha: 0.4),
+                blurRadius: 16,
+                offset: const Offset(0, 8),
+              ),
+              BoxShadow(
+                color: widget.gradient[1].withValues(alpha: 0.2),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    widget.icon,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  widget.label,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12,
+                    height: 1.2,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

@@ -5,14 +5,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 class DailyRoutine {
   final bool salahCompleted;
   final bool dhikrDone;
-  final bool quranDone;
   final bool duaDone;
   final bool goodDeedDone;
 
   const DailyRoutine({
     required this.salahCompleted,
     required this.dhikrDone,
-    required this.quranDone,
     required this.duaDone,
     required this.goodDeedDone,
   });
@@ -20,14 +18,12 @@ class DailyRoutine {
   DailyRoutine copyWith({
     bool? salahCompleted,
     bool? dhikrDone,
-    bool? quranDone,
     bool? duaDone,
     bool? goodDeedDone,
   }) {
     return DailyRoutine(
       salahCompleted: salahCompleted ?? this.salahCompleted,
       dhikrDone: dhikrDone ?? this.dhikrDone,
-      quranDone: quranDone ?? this.quranDone,
       duaDone: duaDone ?? this.duaDone,
       goodDeedDone: goodDeedDone ?? this.goodDeedDone,
     );
@@ -36,7 +32,6 @@ class DailyRoutine {
   static DailyRoutine defaults() => const DailyRoutine(
         salahCompleted: false,
         dhikrDone: false,
-        quranDone: false,
         duaDone: false,
         goodDeedDone: false,
       );
@@ -45,7 +40,6 @@ class DailyRoutine {
     return DailyRoutine(
       salahCompleted: (json['salahCompleted'] as bool?) ?? false,
       dhikrDone: (json['dhikrDone'] as bool?) ?? false,
-      quranDone: (json['quranDone'] as bool?) ?? false,
       duaDone: (json['duaDone'] as bool?) ?? false,
       goodDeedDone: (json['goodDeedDone'] as bool?) ?? false,
     );
@@ -54,7 +48,6 @@ class DailyRoutine {
   Map<String, dynamic> toJson() => {
         'salahCompleted': salahCompleted,
         'dhikrDone': dhikrDone,
-        'quranDone': quranDone,
         'duaDone': duaDone,
         'goodDeedDone': goodDeedDone,
       };
@@ -84,10 +77,10 @@ class DailyRoutineStore {
     final today = DateTime.now();
     final days = <DailyRoutine>[];
     for (int i = n - 1; i >= 0; i--) {
-      final d = DateTime(today.year, today.month, today.day).subtract(Duration(days: i));
+      final d = DateTime(today.year, today.month, today.day)
+          .subtract(Duration(days: i));
       days.add(await loadForDate(d));
     }
     return days;
   }
 }
-

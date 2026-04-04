@@ -68,27 +68,64 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   controller: _controller,
                   onPageChanged: (index) => setState(() => _step = index),
                   children: [
-                    const _OnboardingSlide(
-                      icon: Icons.mosque_rounded,
-                      iconBg: Color(0xFFE2ECE6),
-                      title: 'Simplify Your Islamic Life',
-                      subtitle: 'Prayer times, Qur\'an, Dhikr, and more - all in one calm space.',
+                    Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: Image.asset(
+                              'assets/picture/logo1.jpeg',
+                              width: 200,
+                              height: 200,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          const SizedBox(height: 40),
+                          Text(
+                            'Simplify Your Islamic Life',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineMedium
+                                ?.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                  color: const Color(0xFF1a1a2e),
+                                ),
+                          ),
+                          const SizedBox(height: 14),
+                          Text(
+                            'Prayer times, Qur\'an, Dhikr, and more - all in one calm space.',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(
+                                  color: const Color(0xFF2d2d44),
+                                  height: 1.45,
+                                ),
+                          ),
+                        ],
+                      ),
                     ),
                     const _OnboardingSlide(
                       icon: Icons.checklist_rounded,
                       iconBg: Color(0xFFF5EFE0),
                       title: 'Build Better Habits',
-                      subtitle: 'Stay on track with daily checklists and gentle reminders for your Deen routine.',
+                      subtitle:
+                          'Stay on track with daily checklists and gentle reminders for your Deen routine.',
                     ),
                     const _OnboardingSlide(
                       icon: Icons.self_improvement_rounded,
                       iconBg: Color(0xFFE9E9E9),
                       title: 'Find Peace & Calm',
-                      subtitle: 'A calm, ad-free experience that respects your spiritual journey.',
+                      subtitle:
+                          'A calm, ad-free experience that respects your spiritual journey.',
                     ),
                     _LanguageSlide(
                       selected: _draft.language,
-                      onChanged: (value) => setState(() => _draft = _draft.copyWith(language: value)),
+                      onChanged: (value) => setState(
+                          () => _draft = _draft.copyWith(language: value)),
                     ),
                   ],
                 ),
@@ -101,7 +138,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primary,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
                   ),
                   onPressed: () async {
                     if (isLast) {
@@ -163,7 +201,7 @@ class _OnboardingSlide extends StatelessWidget {
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                 fontWeight: FontWeight.w800,
-                color: const Color(0xFF15162E),
+                color: const Color(0xFF1a1a2e),
               ),
         ),
         const SizedBox(height: 14),
@@ -171,7 +209,7 @@ class _OnboardingSlide extends StatelessWidget {
           subtitle,
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: const Color(0xFF585A68),
+                color: const Color(0xFF2d2d44),
                 height: 1.45,
               ),
         ),
@@ -203,12 +241,18 @@ class _LanguageSlide extends StatelessWidget {
         const SizedBox(height: 26),
         Text(
           'Choose Language',
-          style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800),
+          style: Theme.of(context)
+              .textTheme
+              .headlineMedium
+              ?.copyWith(fontWeight: FontWeight.w800),
         ),
         const SizedBox(height: 4),
         Text(
           'ভাষা নির্বাচন করুন',
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700),
+          style: Theme.of(context)
+              .textTheme
+              .headlineSmall
+              ?.copyWith(fontWeight: FontWeight.w700),
         ),
         const SizedBox(height: 24),
         _LanguageOption(
@@ -253,7 +297,10 @@ class _LanguageOption extends StatelessWidget {
         decoration: BoxDecoration(
           color: selected ? const Color(0xFFDCE5DF) : const Color(0xFFF7F7F5),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: selected ? const Color(0xFF1C7E53) : const Color(0xFFE3E1DD), width: 2),
+          border: Border.all(
+              color:
+                  selected ? const Color(0xFF1C7E53) : const Color(0xFFE3E1DD),
+              width: 2),
         ),
         child: Row(
           children: [
@@ -261,15 +308,24 @@ class _LanguageOption extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
+                  Text(title,
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleLarge
+                          ?.copyWith(fontWeight: FontWeight.w800)),
                   const SizedBox(height: 4),
-                  Text(subtitle, style: Theme.of(context).textTheme.titleSmall?.copyWith(color: const Color(0xFF66697A))),
+                  Text(subtitle,
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleSmall
+                          ?.copyWith(color: const Color(0xFF3a3a4a))),
                 ],
               ),
             ),
             Icon(
               selected ? Icons.check_circle : Icons.circle_outlined,
-              color: selected ? const Color(0xFF1C7E53) : const Color(0xFFCBC8C2),
+              color:
+                  selected ? const Color(0xFF1C7E53) : const Color(0xFFCBC8C2),
             ),
           ],
         ),
@@ -294,7 +350,8 @@ class _Dots extends StatelessWidget {
           height: 10,
           margin: const EdgeInsets.symmetric(horizontal: 4),
           decoration: BoxDecoration(
-            color: i == index ? const Color(0xFF1C8A57) : const Color(0xFFE0DDD6),
+            color:
+                i == index ? const Color(0xFF1C8A57) : const Color(0xFFE0DDD6),
             borderRadius: BorderRadius.circular(14),
           ),
         ),
@@ -302,4 +359,3 @@ class _Dots extends StatelessWidget {
     );
   }
 }
-

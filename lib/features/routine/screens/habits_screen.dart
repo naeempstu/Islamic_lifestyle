@@ -37,24 +37,30 @@ class _HabitsScreenState extends State<HabitsScreen> {
         final routine = snapshot.data!;
         final totalDone = [
           routine.salahCompleted,
-          routine.quranDone,
           routine.dhikrDone,
           routine.duaDone,
           routine.goodDeedDone,
         ].where((v) => v).length;
-        final progress = totalDone / 5.0;
+        final progress = totalDone / 4.0;
         return ListView(
           padding: const EdgeInsets.all(16),
           children: [
             Text(
-              widget.language == AppLanguage.bn ? 'দৈনিক দীন রুটিন' : 'Daily Deen Routine',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800),
+              widget.language == AppLanguage.bn
+                  ? 'দৈনিক দীন রুটিন'
+                  : 'Daily Deen Routine',
+              style: Theme.of(context)
+                  .textTheme
+                  .headlineMedium
+                  ?.copyWith(fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 14),
             Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: const Color(0xFF22925D),
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey[800]
+                    : const Color(0xFF22925D),
                 borderRadius: BorderRadius.circular(24),
               ),
               child: Column(
@@ -63,19 +69,28 @@ class _HabitsScreenState extends State<HabitsScreen> {
                   Row(
                     children: [
                       Text(
-                        widget.language == AppLanguage.bn ? 'আজকের অগ্রগতি' : 'Today\'s Progress',
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 24),
+                        widget.language == AppLanguage.bn
+                            ? 'আজকের অগ্রগতি'
+                            : 'Today\'s Progress',
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 24),
                       ),
                       const Spacer(),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 8),
                         decoration: BoxDecoration(
                           color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
-                          '$totalDone/5',
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 26),
+                          '$totalDone/4',
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 26),
                         ),
                       ),
                     ],
@@ -87,14 +102,19 @@ class _HabitsScreenState extends State<HabitsScreen> {
                       value: progress,
                       minHeight: 12,
                       backgroundColor: Colors.white.withValues(alpha: 0.22),
-                      color: const Color(0xFF7AD3A9),
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.greenAccent
+                          : const Color(0xFF7AD3A9),
                     ),
                   ),
                   const SizedBox(height: 10),
                   Center(
                     child: Text(
                       '${(progress * 100).round()}% Completed',
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 24),
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 24),
                     ),
                   ),
                 ],
@@ -102,8 +122,13 @@ class _HabitsScreenState extends State<HabitsScreen> {
             ),
             const SizedBox(height: 22),
             Text(
-              widget.language == AppLanguage.bn ? 'দৈনিক চেকলিস্ট' : 'Daily Checklist',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
+              widget.language == AppLanguage.bn
+                  ? 'দৈনিক চেকলিস্ট'
+                  : 'Daily Checklist',
+              style: Theme.of(context)
+                  .textTheme
+                  .headlineSmall
+                  ?.copyWith(fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 14),
             _habitItem(
@@ -112,13 +137,6 @@ class _HabitsScreenState extends State<HabitsScreen> {
               checked: routine.salahCompleted,
               icon: Icons.mosque_outlined,
               onChanged: (v) => _save(routine.copyWith(salahCompleted: v)),
-            ),
-            _habitItem(
-              titleBn: 'কুরআন পড়া',
-              titleEn: 'Qur\'an Reading',
-              checked: routine.quranDone,
-              icon: Icons.menu_book_outlined,
-              onChanged: (v) => _save(routine.copyWith(quranDone: v)),
             ),
             _habitItem(
               titleBn: 'যিকির করা',
@@ -176,7 +194,10 @@ class _HabitsScreenState extends State<HabitsScreen> {
           Expanded(
             child: Text(
               widget.language == AppLanguage.bn ? titleBn : titleEn,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+              style: Theme.of(context)
+                  .textTheme
+                  .titleLarge
+                  ?.copyWith(fontWeight: FontWeight.w700),
             ),
           ),
           Checkbox(

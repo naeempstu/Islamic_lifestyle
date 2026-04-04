@@ -1,53 +1,55 @@
-# Google Maps Setup Guide - বিস্তারিত নির্দেশাবলী
+# 🗺️ Google Maps Official API Setup
 
-গুগল ম্যাপস কাজ করাতে নিম্নলিখিত পদক্ষেপ অনুসরণ করুন:
+## Quick Start
 
-## 1️⃣ Google Cloud Project সেটআপ
-
-### Step 1: Google Cloud Console-এ প্রজেক্ট তৈরি করুন
-1. https://console.cloud.google.com/ এ যান
-2. নতুন প্রজেক্ট তৈরি করুন
-3. প্রজেক্ট নাম: `Islamic Lifestyle App`
-
-### Step 2: APIs Enable করুন
-1. Search bar-এ "Maps SDK for Android" খুঁজুন এবং Enable করুন
-2. Search bar-এ "Maps SDK for iOS" খুঁজুন এবং Enable করুন
-
-### Step 3: API Key তৈরি করুন
-1. Left sidebar থেকে "Credentials" ক্লিক করুন
-2. "Create Credentials" ক্লিক করুন
-3. "API Key" নির্বাচন করুন
-4. আপনার API Key কপি করুন (পরবর্তীতে ব্যবহার করবেন)
+**What's New**: Now using official Google Maps API (Places API) for real-time mosque data!
 
 ---
 
-## 2️⃣ Android Configuration
+## 📋 Step 1: Get Google Maps API Key
 
-### AndroidManifest.xml আপডেট করুন
+### 1.1 Go to Google Cloud Console
+- Visit: https://console.cloud.google.com/
+- Create a new project or select existing one
 
-File: `android/app/src/main/AndroidManifest.xml`
+### 1.2 Enable Required APIs
+In Google Cloud Console:
+1. Go to **APIs & Services** → **Library**
+2. Enable these APIs:
+   - ✅ **Maps SDK for Android**
+   - ✅ **Maps SDK for iOS**  
+   - ✅ **Places API**
 
-মেটাডেটা সেকশন খুঁজুন এবং নিম্নলিখিত লাইন পরিবর্তন করুন:
+### 1.3 Create API Key
+1. Go to **APIs & Services** → **Credentials**
+2. Click **Create Credentials** → **API Key**
+3. Copy your API Key (looks like: `AIzaSyD_XXXXXXXX...`)
+
+---
+
+## 🔐 Step 2: Android Setup
+
+### File: `android/app/src/main/AndroidManifest.xml`
+
+Find the `<application>` tag and add:
 
 ```xml
 <meta-data
     android:name="com.google.android.geo.API_KEY"
-    android:value="YOUR_GOOGLE_MAPS_API_KEY_HERE" />
+    android:value="YOUR_GOOGLE_MAPS_API_KEY" />
 ```
 
-**YOUR_GOOGLE_MAPS_API_KEY_HERE** এর জায়গায় আপনার API Key পেস্ট করুন।
+Replace `YOUR_GOOGLE_MAPS_API_KEY` with your actual key.
 
-### build.gradle.kts আপডেট করুন
+### File: `android/app/build.gradle.kts`
 
-File: `android/app/build.gradle.kts`
-
+Update to:
 ```kotlin
 android {
-    compileSdk 35  // কমপক্ষে 33
+    compileSdk 35
     
     defaultConfig {
-        minSdk 20  // কমপক্ষে 20 চাই Google Maps এর জন্য
-    }
+        minSdk 20
 }
 ```
 

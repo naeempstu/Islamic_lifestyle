@@ -71,7 +71,9 @@ class _AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F7F5),
+      backgroundColor: Theme.of(context).brightness == Brightness.dark
+          ? Colors.grey[900]
+          : const Color(0xFFF7F7F5),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(24, 24, 24, 12),
@@ -79,11 +81,14 @@ class _AuthScreenState extends State<AuthScreen> {
             children: [
               const SizedBox(height: 20),
               Center(
-                child: Container(
-                  width: 120,
-                  height: 120,
-                  decoration: const BoxDecoration(color: Color(0xFFE3ECE7), shape: BoxShape.circle),
-                  child: const Icon(Icons.mosque_rounded, size: 58, color: Color(0xFF1D7E53)),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Image.asset(
+                    'assets/picture/logo1.jpeg',
+                    width: 120,
+                    height: 120,
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
               const SizedBox(height: 22),
@@ -91,7 +96,9 @@ class _AuthScreenState extends State<AuthScreen> {
                 child: Text(
                   'Islamic Lifestyle',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        color: const Color(0xFF15162E),
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : const Color(0xFF15162E),
                         fontWeight: FontWeight.w800,
                       ),
                 ),
@@ -103,6 +110,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 decoration: _inputDecoration(
                   hint: 'Email',
                   icon: Icons.mail_outline,
+                  context: context,
                 ),
               ),
               const SizedBox(height: 14),
@@ -112,10 +120,13 @@ class _AuthScreenState extends State<AuthScreen> {
                 decoration: _inputDecoration(
                   hint: 'Password',
                   icon: Icons.lock_outline,
+                  context: context,
                 ).copyWith(
                   suffixIcon: IconButton(
                     onPressed: () => setState(() => _obscure = !_obscure),
-                    icon: Icon(_obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined),
+                    icon: Icon(_obscure
+                        ? Icons.visibility_outlined
+                        : Icons.visibility_off_outlined),
                   ),
                 ),
               ),
@@ -135,13 +146,15 @@ class _AuthScreenState extends State<AuthScreen> {
                   onPressed: _loading ? null : _submit,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF218B56),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
                   ),
                   child: _loading
                       ? const SizedBox(
                           width: 22,
                           height: 22,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: Colors.white),
                         )
                       : Text(_signupMode ? 'Register' : 'Login'),
                 ),
@@ -167,8 +180,10 @@ class _AuthScreenState extends State<AuthScreen> {
                   label: const Text('Sign in with Google'),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: const Color(0xFF218B56),
-                    side: const BorderSide(color: Color(0xFF218B56), width: 1.5),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    side:
+                        const BorderSide(color: Color(0xFF218B56), width: 1.5),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
                   ),
                 ),
               ),
@@ -181,7 +196,9 @@ class _AuthScreenState extends State<AuthScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(_signupMode ? 'Already have an account?' : 'Don\'t have an account?'),
+                  Text(_signupMode
+                      ? 'Already have an account?'
+                      : 'Don\'t have an account?'),
                   TextButton(
                     onPressed: () => setState(() => _signupMode = !_signupMode),
                     child: Text(_signupMode ? 'Login' : 'Register'),
@@ -195,15 +212,23 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  InputDecoration _inputDecoration({required String hint, required IconData icon}) {
+  InputDecoration _inputDecoration({
+    required String hint,
+    required IconData icon,
+    required BuildContext context,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return InputDecoration(
       hintText: hint,
       prefixIcon: Icon(icon),
       filled: true,
-      fillColor: const Color(0xFFF8F8F6),
+      fillColor: isDark ? Colors.grey[800] : const Color(0xFFF8F8F6),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: Color(0xFFE2E0DB), width: 1.3),
+        borderSide: BorderSide(
+          color: isDark ? Colors.grey[700]! : const Color(0xFFE2E0DB),
+          width: 1.3,
+        ),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
@@ -212,4 +237,3 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 }
-

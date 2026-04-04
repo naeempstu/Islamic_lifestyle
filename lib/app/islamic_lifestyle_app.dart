@@ -10,8 +10,8 @@ import '../core/theme/app_theme.dart';
 import '../features/dhikr/data/dhikr_repository.dart';
 import '../features/duas/data/duas_repository.dart';
 import '../features/prayer/services/prayer_times_service.dart';
-import '../features/quran/data/quran_repository.dart';
 import '../features/hadith/data/hadith_repository.dart';
+import '../features/quran/data/quran_repository.dart';
 import '../features/routine/data/daily_routine_store.dart';
 import '../features/onboarding/screens/onboarding_screen.dart';
 import 'main_shell.dart';
@@ -41,11 +41,33 @@ class _IslamicLifestyleAppState extends State<IslamicLifestyleApp> {
       final prefs = await AppPrefs.init();
       final settings = await prefs.loadSettings();
 
-      final firebaseReady = await FirebaseInit.initialize();
-      await NotificationService.instance.init();
-      if (firebaseReady) {
-        await PushNotificationService.instance.init();
-      }
+      // 🚀 Optimize: Run non-critical initialization in parallel
+      //    Don't block the UI on these
+      Future.microtask(() async {
+        try {
+          await FirebaseInit.initialize();
+        } catch (e) {
+          debugPrint('Firebase init error: $e');
+        }
+      });
+
+      Future.microtask(() async {
+        try {
+          await NotificationService.instance.init();
+        } catch (e) {
+          debugPrint('Notification init error: $e');
+        }
+      });
+
+      Future.microtask(() async {
+        try {
+          // Delay push notification init slightly to ensure Firebase is initialized
+          await Future.delayed(const Duration(milliseconds: 500));
+          await PushNotificationService.instance.init();
+        } catch (e) {
+          debugPrint('Push notification init error: $e');
+        }
+      });
 
       await prefs.ensureGuestId();
 
@@ -81,8 +103,22 @@ class _IslamicLifestyleAppState extends State<IslamicLifestyleApp> {
       return MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: AppTheme.light(darkMode: false),
-        home: const Scaffold(
-          body: Center(child: CircularProgressIndicator()),
+        home: Scaffold(
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const CircularProgressIndicator(),
+                const SizedBox(height: 16),
+                Text(
+                  _settings?.language.toString() == 'AppLanguage.bn'
+                      ? 'লোড হচ্ছে...'
+                      : 'Loading...',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ],
+            ),
+          ),
         ),
       );
     }
@@ -101,10 +137,10 @@ class _IslamicLifestyleAppState extends State<IslamicLifestyleApp> {
               locationService: LocationService(),
               prayerTimesService: PrayerTimesService.instance,
               routineStore: DailyRoutineStore(),
-              quranRepository: QuranRepository(),
               dhikrRepository: DhikrRepository(),
               duasRepository: DuasRepository(),
               hadithRepository: HadithRepository(),
+              quranRepository: QuranRepository(),
             )
           : OnboardingScreen(
               prefs: _prefs!,
@@ -117,4 +153,3 @@ class _IslamicLifestyleAppState extends State<IslamicLifestyleApp> {
     );
   }
 }
-

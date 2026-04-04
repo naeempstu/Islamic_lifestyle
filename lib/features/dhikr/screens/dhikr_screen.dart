@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:vibration/vibration.dart';
 
 import '../../../core/models/app_enums.dart';
-import '../../duas/data/duas_models.dart';
-import '../../duas/data/duas_repository.dart';
 import '../data/dhikr_models.dart';
 import '../data/dhikr_repository.dart';
 import '../data/tasbih_store.dart';
@@ -12,14 +10,12 @@ class DhikrScreen extends StatefulWidget {
   final AppLanguage language;
   final bool vibrationEnabled;
   final DhikrRepository dhikrRepository;
-  final DuasRepository duasRepository;
 
   const DhikrScreen({
     super.key,
     required this.language,
     required this.vibrationEnabled,
     required this.dhikrRepository,
-    required this.duasRepository,
   });
 
   @override
@@ -53,296 +49,327 @@ class _DhikrScreenState extends State<DhikrScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Column(
-        children: [
-          const SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                Text(
-                  widget.language == AppLanguage.bn ? 'যিকির' : 'Dhikr',
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 10),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            child: TabBar(
-              tabs: [
-                Tab(
-                  text: 'Dhikr'
-                ),
-                Tab(
-                  text: 'Duas'
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: TabBarView(
-          children: [
-            _DhikrTab(
-              language: widget.language,
-              repository: widget.dhikrRepository,
-              tasbihCount: _tasbihCount,
-              onTapTasbih: _increment,
-            ),
-            _DuasTab(
-              language: widget.language,
-              repository: widget.duasRepository,
-            ),
-          ],
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          widget.language == AppLanguage.bn ? 'যিকির' : 'Dhikr',
         ),
-          ),
-        ],
+        centerTitle: true,
       ),
-    );
-  }
-}
-
-class _DhikrTab extends StatelessWidget {
-  final AppLanguage language;
-  final DhikrRepository repository;
-  final int tasbihCount;
-  final VoidCallback onTapTasbih;
-
-  const _DhikrTab({
-    required this.language,
-    required this.repository,
-    required this.tasbihCount,
-    required this.onTapTasbih,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        Row(
-          children: [
-            Expanded(child: _topCard(Icons.touch_app_outlined, 'Tasbih Counter', const Color(0xFFE3ECE6), const Color(0xFF1D7E53))),
-            const SizedBox(width: 12),
-            Expanded(child: _topCard(Icons.auto_awesome_outlined, 'Duas', const Color(0xFFF5EFE0), const Color(0xFFC7A452))),
-          ],
-        ),
-        const SizedBox(height: 12),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton.icon(
-            onPressed: onTapTasbih,
-            icon: const Icon(Icons.add),
-            label: Text(language == AppLanguage.bn ? '১ যোগ করুন' : 'Add 1'),
-          ),
-        ),
-        const SizedBox(height: 16),
-        Text(
-          language == AppLanguage.bn ? 'যিকির কালেকশন' : 'Dhikr Collection',
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
-        ),
-        const SizedBox(height: 12),
-        FutureBuilder<List<DhikrCategory>>(
-          future: repository.loadDhikrCategories(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
-            final cats = snapshot.data!;
-            return Column(
-              children: cats
-                  .map(
-                    (cat) => Card(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              repository.localizedTitle(cat, language),
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                            const SizedBox(height: 8),
-                            for (final item in cat.items)
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 10),
-                                child: _DhikrItemRow(
-                                  language: language,
-                                  item: item,
-                                ),
-                              ),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: Text('$tasbihCount', style: const TextStyle(color: Color(0xFFC7A452), fontWeight: FontWeight.w700)),
-                            ),
-                          ],
-                        ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          // Tasbih Counter Card
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: Theme.of(context).brightness == Brightness.dark
+                    ? [const Color(0xFF1B5E38), const Color(0xFF0D3D23)]
+                    : [const Color(0xFFE3ECE6), const Color(0xFFC8E6C9)],
+              ),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 56,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF2A9D5D)
+                            : Colors.white,
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Icon(
+                        Icons.touch_app_outlined,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : const Color(0xFF1D7E53),
+                        size: 28,
                       ),
                     ),
-                  )
-                  .toList(),
-            );
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _topCard(IconData icon, String title, Color bg, Color fg) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18)),
-      child: Column(
-        children: [
-          Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(14)),
-            child: Icon(icon, color: fg),
-          ),
-          const SizedBox(height: 10),
-          Text(title, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.w700)),
-        ],
-      ),
-    );
-  }
-}
-
-class _DhikrItemRow extends StatelessWidget {
-  final AppLanguage language;
-  final DhikrItem item;
-
-  const _DhikrItemRow({required this.language, required this.item});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Directionality(
-          textDirection: TextDirection.rtl,
-          child: Text(
-            item.arabic,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 18),
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          language == AppLanguage.bn ? item.bn : item.en,
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
-        const SizedBox(height: 4),
-        Text(
-          language == AppLanguage.bn
-              ? 'ডিফল্ট কাউন্ট: ${item.defaultCount}'
-              : 'Default count: ${item.defaultCount}',
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-      ],
-    );
-  }
-}
-
-class _DuasTab extends StatelessWidget {
-  final AppLanguage language;
-  final DuasRepository repository;
-
-  const _DuasTab({required this.language, required this.repository});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        Text(
-          language == AppLanguage.bn ? 'শান্তভাবে দোয়া পড়ুন' : 'Read duas gently',
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        const SizedBox(height: 12),
-        FutureBuilder<List<DuaCategory>>(
-          future: repository.loadDuaCategories(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
-            final cats = snapshot.data!;
-            return Column(
-              children: [
-                for (final cat in cats)
-                  Card(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
+                    const SizedBox(width: 14),
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            repository.localizedTitle(cat, language),
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                          const SizedBox(height: 8),
-                          for (final dua in cat.items)
-                            _DuaItemCard(
-                              language: language,
-                              dua: dua,
+                            widget.language == AppLanguage.bn
+                                ? 'আজকের তাসবিহ'
+                                : 'Today\'s Tasbih',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
+                              color: Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.white
+                                  : const Color(0xFF1D7E53),
                             ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            _tasbihCount.toString(),
+                            style: TextStyle(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 28,
+                              color: Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.white
+                                  : const Color(0xFF1D7E53),
+                            ),
+                          ),
                         ],
                       ),
                     ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: _increment,
+                    icon: const Icon(Icons.add),
+                    label: Text(
+                      widget.language == AppLanguage.bn
+                          ? 'এক যোগ করুন'
+                          : 'Add 1',
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          Theme.of(context).brightness == Brightness.dark
+                              ? const Color(0xFF2A9D5D)
+                              : const Color(0xFF1D7E53),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
                   ),
+                ),
               ],
-            );
-          },
-        ),
-        const SizedBox(height: 20),
-        Text(
-          language == AppLanguage.bn
-              ? 'নোট: পূর্ণ দোয়া লাইব্রেরি পরে যোগ করা যাবে।'
-              : 'Note: Expand the dua library later for production.',
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-      ],
-    );
-  }
-}
-
-class _DuaItemCard extends StatelessWidget {
-  final AppLanguage language;
-  final DuaItem dua;
-
-  const _DuaItemCard({required this.language, required this.dua});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 10),
-      elevation: 0,
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              language == AppLanguage.bn ? dua.titleBn : dua.titleEn,
-              style: Theme.of(context).textTheme.titleMedium,
             ),
-            const SizedBox(height: 6),
-            Directionality(
-              textDirection: TextDirection.rtl,
-              child: Text(
-                dua.arabic,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 18),
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              language == AppLanguage.bn ? dua.bn : dua.en,
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            widget.language == AppLanguage.bn
+                ? 'যিকির সংগ্রহ'
+                : 'Dhikr Collection',
+            style: Theme.of(context)
+                .textTheme
+                .headlineSmall
+                ?.copyWith(fontWeight: FontWeight.w800),
+          ),
+          const SizedBox(height: 12),
+          FutureBuilder<List<DhikrCategory>>(
+            future: widget.dhikrRepository.loadDhikrCategories(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(32),
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              }
+
+              if (snapshot.hasError) {
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Text(
+                      widget.language == AppLanguage.bn
+                          ? 'যিকির লোড করতে ব্যর্থ'
+                          : 'Failed to load dhikr',
+                    ),
+                  ),
+                );
+              }
+
+              final categories = snapshot.data ?? [];
+
+              if (categories.isEmpty) {
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(32),
+                    child: Text(
+                      widget.language == AppLanguage.bn
+                          ? 'কোনো যিকির পাওয়া যায়নি'
+                          : 'No dhikr found',
+                    ),
+                  ),
+                );
+              }
+
+              return Column(
+                children: categories
+                    .map(
+                      (category) => _DhikrCategoryCard(
+                        language: widget.language,
+                        category: category,
+                        repository: widget.dhikrRepository,
+                        tasbihCount: _tasbihCount,
+                      ),
+                    )
+                    .toList(),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
 }
 
+class _DhikrCategoryCard extends StatefulWidget {
+  final AppLanguage language;
+  final DhikrCategory category;
+  final DhikrRepository repository;
+  final int tasbihCount;
+
+  const _DhikrCategoryCard({
+    required this.language,
+    required this.category,
+    required this.repository,
+    required this.tasbihCount,
+  });
+
+  @override
+  State<_DhikrCategoryCard> createState() => _DhikrCategoryCardState();
+}
+
+class _DhikrCategoryCardState extends State<_DhikrCategoryCard> {
+  bool _isExpanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      elevation: 2,
+      child: InkWell(
+        onTap: () {
+          setState(() {
+            _isExpanded = !_isExpanded;
+          });
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.repository
+                              .localizedTitle(widget.category, widget.language),
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w700),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          widget.language == AppLanguage.bn
+                              ? '${widget.category.items.length} যিকির'
+                              : '${widget.category.items.length} Dhikr',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.grey[400]
+                                    : Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    _isExpanded ? Icons.expand_less : Icons.expand_more,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.grey[400]
+                        : Colors.grey[600],
+                  ),
+                ],
+              ),
+              if (_isExpanded) ...[
+                const Divider(),
+                ...widget.category.items.map(
+                  (item) => Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Directionality(
+                          textDirection: TextDirection.rtl,
+                          child: Text(
+                            item.arabic,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(fontSize: 16),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        if (widget.language == AppLanguage.bn)
+                          Text(
+                            item.bn,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.grey[200]
+                                  : Colors.black87,
+                              height: 1.6,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          )
+                        else
+                          Text(
+                            item.en,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.grey[200]
+                                  : Colors.black87,
+                              height: 1.6,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        const SizedBox(height: 8),
+                        Text(
+                          widget.language == AppLanguage.bn
+                              ? 'ডিফল্ট কাউন্ট: ${item.defaultCount}'
+                              : 'Default count: ${item.defaultCount}',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.amber[300]
+                                    : Colors.orange,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

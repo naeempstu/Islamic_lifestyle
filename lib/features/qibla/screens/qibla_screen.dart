@@ -92,6 +92,9 @@ class _QiblaScreenState extends State<QiblaScreen> {
                     Vibration.vibrate(duration: 100);
                   }
 
+                  final isDark =
+                      Theme.of(context).brightness == Brightness.dark;
+
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
@@ -107,7 +110,7 @@ class _QiblaScreenState extends State<QiblaScreen> {
                         height: 300,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.green[50],
+                          color: isDark ? Colors.grey[800] : Colors.green[50],
                           border: Border.all(
                             color:
                                 isAligned ? Colors.greenAccent : Colors.green,
@@ -121,9 +124,10 @@ class _QiblaScreenState extends State<QiblaScreen> {
                             Container(
                               width: 20,
                               height: 20,
-                              decoration: const BoxDecoration(
+                              decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: Colors.green,
+                                color:
+                                    isDark ? Colors.greenAccent : Colors.green,
                               ),
                             ),
 
@@ -138,9 +142,15 @@ class _QiblaScreenState extends State<QiblaScreen> {
                                     height: 120,
                                     color: isAligned
                                         ? Colors.greenAccent
-                                        : Colors.green,
+                                        : (isDark
+                                            ? Colors.green[300]
+                                            : Colors.green),
                                   ),
-                                  const Icon(Icons.arrow_drop_up, size: 40),
+                                  Icon(Icons.arrow_drop_up,
+                                      size: 40,
+                                      color: isDark
+                                          ? Colors.greenAccent
+                                          : Colors.green),
                                 ],
                               ),
                             ),

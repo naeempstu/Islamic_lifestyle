@@ -71,7 +71,11 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
               height: 36,
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(99),
-                  border: Border.all(color: const Color(0xFF1A1C30))),
+                  border: Border.all(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.grey[600]!
+                        : const Color(0xFF1A1C30),
+                  )),
               child: const Icon(Icons.explore_outlined, size: 20),
             ),
           ],
@@ -95,7 +99,10 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-              color: Colors.white, borderRadius: BorderRadius.circular(18)),
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.grey[900]
+                  : Colors.white,
+              borderRadius: BorderRadius.circular(18)),
           child: Row(
             children: [
               Text(
@@ -111,7 +118,9 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
                 decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 239, 241, 240),
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.grey[800]
+                        : const Color.fromARGB(255, 239, 241, 240),
                     borderRadius: BorderRadius.circular(20)),
                 child: Text(
                   '${_currentSettings.azanEnabled.values.where((v) => v).length}/5',
@@ -160,11 +169,11 @@ class _PrayerTimesCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = [
-      (prayer: PrayerName.fajr, time: times.fajr),
-      (prayer: PrayerName.dhuhr, time: times.dhuhr),
-      (prayer: PrayerName.asr, time: times.asr),
-      (prayer: PrayerName.maghrib, time: times.maghrib),
-      (prayer: PrayerName.isha, time: times.isha),
+      (prayer: PrayerName.fajr, start: times.fajr, end: times.fajrEnd),
+      (prayer: PrayerName.dhuhr, start: times.dhuhr, end: times.dhuhrEnd),
+      (prayer: PrayerName.asr, start: times.asr, end: times.asrEnd),
+      (prayer: PrayerName.maghrib, start: times.maghrib, end: times.maghribEnd),
+      (prayer: PrayerName.isha, start: times.isha, end: times.ishaEnd),
     ];
 
     String formatTime(DateTime dt) {
@@ -175,9 +184,9 @@ class _PrayerTimesCard extends StatelessWidget {
     }
 
     final now = DateTime.now();
-    final next =
-        items.firstWhere((p) => p.time.isAfter(now), orElse: () => items.first);
-    final left = next.time.difference(now);
+    final next = items.firstWhere((p) => p.start.isAfter(now),
+        orElse: () => items.first);
+    final left = next.start.difference(now);
     return Column(
       children: [
         Container(
@@ -185,15 +194,22 @@ class _PrayerTimesCard extends StatelessWidget {
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(24),
-            gradient: const LinearGradient(colors: [
-              Color.fromARGB(255, 129, 129, 214),
-              Color.fromARGB(255, 132, 152, 193)
+            gradient: LinearGradient(colors: [
+              Theme.of(context).brightness == Brightness.dark
+                  ? const Color.fromARGB(255, 60, 80, 120)
+                  : const Color.fromARGB(255, 129, 129, 214),
+              Theme.of(context).brightness == Brightness.dark
+                  ? const Color.fromARGB(255, 70, 100, 140)
+                  : const Color.fromARGB(255, 132, 152, 193)
             ]),
           ),
           child: Row(
             children: [
-              const Icon(Icons.wb_sunny_outlined,
-                  color: Colors.white, size: 34),
+              Icon(Icons.wb_sunny_outlined,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.amber[300]
+                      : Colors.white,
+                  size: 34),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -203,24 +219,31 @@ class _PrayerTimesCard extends StatelessWidget {
                       language == AppLanguage.bn
                           ? 'পরবর্তী নামাজ'
                           : 'Next Prayer',
-                      style: const TextStyle(color: Colors.white70),
+                      style: TextStyle(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.grey[300]
+                            : Colors.white70,
+                      ),
                     ),
                     Text(
                         language == AppLanguage.bn
                             ? next.prayer.labelBn()
                             : next.prayer.labelEn(),
-                        style: const TextStyle(
-                            color: Color.fromARGB(255, 248, 245, 245),
+                        style: TextStyle(
+                            color: Colors.white,
                             fontWeight: FontWeight.w800,
                             fontSize: 26)),
                   ],
                 ),
               ),
               Text(
-                '${formatTime(next.time)}\n${left.inHours}h ${left.inMinutes.remainder(60)}m left',
+                '${formatTime(next.start)}\n${left.inHours}h ${left.inMinutes.remainder(60)}m left',
                 textAlign: TextAlign.right,
-                style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.w700),
+                style: TextStyle(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.grey[200]
+                        : Colors.white,
+                    fontWeight: FontWeight.w700),
               ),
             ],
           ),
@@ -239,13 +262,17 @@ class _PrayerTimesCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(18),
                 color: item.prayer == next.prayer
                     ? const Color.fromARGB(255, 23, 175, 30)
-                    : Colors.white,
+                    : Theme.of(context).brightness == Brightness.dark
+                        ? Colors.grey[800]
+                        : Colors.white,
                 border: Border.all(
                   color: (settings.azanEnabled[item.prayer] ?? true)
                       ? (item.prayer == next.prayer
                           ? Colors.white
                           : const Color(0xFF1E8C58))
-                      : Colors.grey.shade300,
+                      : Theme.of(context).brightness == Brightness.dark
+                          ? Colors.grey[600]!
+                          : Colors.grey.shade300,
                   width: 2,
                 ),
               ),
@@ -276,21 +303,25 @@ class _PrayerTimesCard extends StatelessWidget {
                       style: TextStyle(
                         color: item.prayer == next.prayer
                             ? Colors.white
-                            : item.prayer == PrayerName.dhuhr
-                                ? const Color(0xFF1A1C30)
-                                : const Color(0xFF303244),
+                            : Theme.of(context).brightness == Brightness.dark
+                                ? Colors.grey[200]
+                                : item.prayer == PrayerName.dhuhr
+                                    ? const Color(0xFF1A1C30)
+                                    : const Color(0xFF303244),
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
                   Text(
-                    formatTime(item.time),
+                    '${formatTime(item.start)} - ${formatTime(item.end)}',
                     style: TextStyle(
                       color: item.prayer == next.prayer
                           ? Colors.white
-                          : item.prayer == PrayerName.dhuhr
-                              ? const Color(0xFF1A1C30)
-                              : const Color(0xFF303244),
+                          : Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey[200]
+                              : item.prayer == PrayerName.dhuhr
+                                  ? const Color(0xFF1A1C30)
+                                  : const Color(0xFF303244),
                       fontWeight: FontWeight.w700,
                     ),
                   ),

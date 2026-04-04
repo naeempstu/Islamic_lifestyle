@@ -40,9 +40,15 @@ dependencies:
   # Maps
   flutter_map: ^6.0.0
   latlong2: ^0.9.1
+  google_maps_flutter: ^2.17.0
+  google_places_flutter: ^2.0.0
 
   # 🔥 API (IMPORTANT)
   http: ^1.1.0    # Updated to satisfy google_fonts compatibility
+
+  # 🎤 AI Chat & Voice
+  speech_to_text: ^7.0.0
+  flutter_tts: ^4.2.5
 
   # Islamic features
   adhan: ^2.0.0+1
@@ -65,7 +71,7 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/quran/
+    - assets/picture/
     - assets/data/duas.json
     - assets/data/dhikr.json
     - assets/data/hadith_sample.json

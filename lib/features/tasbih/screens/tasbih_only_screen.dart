@@ -75,18 +75,25 @@ class _TasbihOnlyScreenState extends State<TasbihOnlyScreen> {
                   curve: Curves.easeOutCubic,
                   width: 220,
                   height: 220,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: LinearGradient(
-                      colors: [Color(0xFF1F8A57), Color(0xFF3EA46F)],
+                      colors: Theme.of(context).brightness == Brightness.dark
+                          ? const [
+                              Color.fromARGB(255, 60, 140, 100),
+                              Color.fromARGB(255, 80, 180, 130),
+                            ]
+                          : const [Color(0xFF1F8A57), Color(0xFF3EA46F)],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Color(0x441F8A57),
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0x44109070)
+                            : const Color(0x441F8A57),
                         blurRadius: 24,
-                        offset: Offset(0, 12),
+                        offset: const Offset(0, 12),
                       ),
                     ],
                   ),

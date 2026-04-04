@@ -11,8 +11,7 @@ import '../features/halal/screens/halal_guide_screen.dart';
 import '../features/home/screens/home_screen.dart';
 import '../features/prayer/screens/prayer_times_screen.dart';
 import '../features/prayer/services/prayer_times_service.dart';
-import '../features/quran/data/quran_repository.dart';
-import '../features/quran/screens/quran_reader_screen.dart';
+
 import '../features/qibla/screens/qibla_screen.dart';
 import '../features/routine/data/daily_routine_store.dart';
 import '../features/routine/screens/habits_screen.dart';
@@ -24,6 +23,10 @@ import '../features/masjid/screens/masjid_locator_screen.dart';
 import '../features/deen_shiksha/screens/deen_shiksha_screen.dart';
 import '../features/hadith/data/hadith_repository.dart';
 import '../features/hadith/screens/hadith_reader_screen.dart';
+import '../features/ai_chat/screens/ai_chat_screen.dart';
+import '../features/duas/screens/duas_screen.dart';
+import '../features/quran/data/quran_repository.dart';
+import '../features/quran/screens/quran_list_screen.dart';
 
 class MainShell extends StatefulWidget {
   final AppSettings settings;
@@ -33,10 +36,10 @@ class MainShell extends StatefulWidget {
   final PrayerTimesService prayerTimesService;
   final DailyRoutineStore routineStore;
 
-  final QuranRepository quranRepository;
   final DhikrRepository dhikrRepository;
   final DuasRepository duasRepository;
   final HadithRepository hadithRepository;
+  final QuranRepository quranRepository;
 
   const MainShell({
     super.key,
@@ -45,10 +48,10 @@ class MainShell extends StatefulWidget {
     required this.locationService,
     required this.prayerTimesService,
     required this.routineStore,
-    required this.quranRepository,
     required this.dhikrRepository,
     required this.duasRepository,
     required this.hadithRepository,
+    required this.quranRepository,
   });
 
   @override
@@ -103,9 +106,6 @@ class _MainShellState extends State<MainShell> {
 
   Future<void> _onHomeQuickAction(HomeQuickAction action) async {
     switch (action) {
-      case HomeQuickAction.quran:
-        setState(() => _index = 2);
-        break;
       case HomeQuickAction.tasbih:
         await Navigator.of(context).push(
           MaterialPageRoute(
@@ -144,6 +144,9 @@ class _MainShellState extends State<MainShell> {
           ),
         );
         break;
+      case HomeQuickAction.nearestMosque:
+        // Handled directly in HomeScreen, no action needed here
+        break;
       case HomeQuickAction.deenShiksha:
         await Navigator.of(context).push(
           MaterialPageRoute(
@@ -157,8 +160,35 @@ class _MainShellState extends State<MainShell> {
           MaterialPageRoute(
             builder: (_) => HadithReaderScreen(
               language: widget.settings.language,
-              hadithRepository: widget.hadithRepository,
             ),
+          ),
+        );
+        break;
+      case HomeQuickAction.duas:
+        await Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => DuasScreen(
+              language: widget.settings.language,
+              repository: widget.duasRepository,
+            ),
+          ),
+        );
+        break;
+      case HomeQuickAction.dhikr:
+        await Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => DhikrScreen(
+              language: widget.settings.language,
+              vibrationEnabled: widget.settings.vibrationEnabled,
+              dhikrRepository: widget.dhikrRepository,
+            ),
+          ),
+        );
+        break;
+      case HomeQuickAction.quran:
+        await Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => const QuranListScreen(),
           ),
         );
         break;
@@ -210,7 +240,6 @@ class _MainShellState extends State<MainShell> {
             MaterialPageRoute(
               builder: (_) => HadithReaderScreen(
                 language: lang,
-                hadithRepository: widget.hadithRepository,
               ),
             ),
           );
@@ -268,17 +297,14 @@ class _MainShellState extends State<MainShell> {
               locationService: widget.locationService,
               prayerTimesService: widget.prayerTimesService,
             ),
-            QuranReaderScreen(
-              language: lang,
-              quranRepository: widget.quranRepository,
-            ),
+            const QuranListScreen(),
             DhikrScreen(
               language: lang,
               vibrationEnabled: widget.settings.vibrationEnabled,
               dhikrRepository: widget.dhikrRepository,
-              duasRepository: widget.duasRepository,
             ),
             HabitsScreen(language: lang, routineStore: widget.routineStore),
+            const AIChatScreen(),
           ],
         ),
       ),
@@ -308,6 +334,10 @@ class _MainShellState extends State<MainShell> {
           BottomNavigationBarItem(
             icon: const Icon(Icons.checklist_outlined),
             label: lang == AppLanguage.bn ? 'হ্যাবিট' : 'Habits',
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.smart_toy_outlined),
+            label: lang == AppLanguage.bn ? 'এআই চ্যাট' : 'AI Chat',
           ),
         ],
       ),
@@ -345,14 +375,25 @@ class _AppDrawer extends StatelessWidget {
                 ],
               ),
             ),
-            child: Align(
-              alignment: Alignment.bottomLeft,
-              child: Text(
-                language == AppLanguage.bn
-                    ? 'আল্লাহর পথে'
-                    : 'On the path of peace',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.asset(
+                    'assets/picture/logo1.jpeg',
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                Text(
+                  language == AppLanguage.bn
+                      ? 'আল্লাহর পথে'
+                      : 'On the path of peace',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ],
             ),
           ),
           ListTile(

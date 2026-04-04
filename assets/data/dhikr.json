@@ -2,35 +2,157 @@
   "morning": [
     {
       "key": "dhikr-morning-01",
-      "titleEn": "Morning remembrance",
-      "titleBn": "সকালের যিকির",
-      "arabic": "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",
+      "titleEn": "Subhan'Allah",
+      "titleBn": "সুবহানাল্লাহ",
+      "arabic": "سُبْحَانَ اللَّهِ",
       "en": "Glorify Allah and praise Him.",
       "bn": "আল্লাহকে পবিত্র বলুন এবং তাঁর প্রশংসা করুন।",
       "defaultCount": 33
+    },
+    {
+      "key": "dhikr-morning-02",
+      "titleEn": "Alhamdulillah",
+      "titleBn": "আলহামদুলিল্লাহ",
+      "arabic": "الْحَمْدُ لِلَّهِ",
+      "en": "All praise is due to Allah.",
+      "bn": "সমস্ত প্রশংসা আল্লাহর জন্য।",
+      "defaultCount": 33
+    },
+    {
+      "key": "dhikr-morning-03",
+      "titleEn": "Allahu Akbar",
+      "titleBn": "আল্লাহু আকবার",
+      "arabic": "اللَّهُ أَكْبَرُ",
+      "en": "Allah is the Greatest.",
+      "bn": "আল্লাহই সবচেয়ে বড়।",
+      "defaultCount": 33
+    },
+    {
+      "key": "dhikr-morning-04",
+      "titleEn": "Morning Protection",
+      "titleBn": "সকালের সুরক্ষা",
+      "arabic": "بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ",
+      "en": "In the Name of Allah with Whose Name nothing can cause harm on earth or in heaven, and He is the All-Hearing, All-Knowing.",
+      "bn": "আল্লাহর নামে যার নামের সাথে পৃথিবী বা আকাশে কোনো ক্ষতি হতে পারে না, এবং তিনি সর্বশ্রোতা, সর্বজ্ঞানী।",
+      "defaultCount": 3
     }
   ],
   "evening": [
     {
       "key": "dhikr-evening-01",
-      "titleEn": "Evening remembrance",
-      "titleBn": "সন্ধ্যার যিকির",
-      "arabic": "أَسْتَغْفِرُ اللَّهَ",
-      "en": "I seek Allah’s forgiveness.",
+      "titleEn": "Istighfar",
+      "titleBn": "ইস্তিগফার",
+      "arabic": "أَسْتَغْفِرُ اللَّهَ",
+      "en": "I seek Allah's forgiveness.",
       "bn": "আমি আল্লাহর কাছে ক্ষমা প্রার্থনা করি।",
       "defaultCount": 100
+    },
+    {
+      "key": "dhikr-evening-02",
+      "titleEn": "Subhan'Allah",
+      "titleBn": "সুবহানাল্লাহ",
+      "arabic": "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",
+      "en": "Glorify Allah and praise Him.",
+      "bn": "আল্লাহকে পবিত্র বলুন এবং তাঁর প্রশংসা করুন।",
+      "defaultCount": 33
+    },
+    {
+      "key": "dhikr-evening-03",
+      "titleEn": "Evening Protection",
+      "titleBn": "সন্ধ্যার সুরক্ষা",
+      "arabic": "الْعَافِيَة",
+      "en": "May Allah grant us good health and well-being.",
+      "bn": "আল্লাহ আমাদের সুস্বাস্থ্য এবং সুস্থতা দান করুন।",
+      "defaultCount": 1
+    },
+    {
+      "key": "dhikr-evening-04",
+      "titleEn": "Evening Dua",
+      "titleBn": "সন্ধ্যার দোয়া",
+      "arabic": "رَضِيتُ بِاللَّهِ رَبًّا وَبِالْإِسْلَامِ دِينًا وَبِمُحَمَّدٍ نَبِيًّا",
+      "en": "I am pleased with Allah as my Lord, Islam as my religion, and Muhammad as my Prophet.",
+      "bn": "আমি আল্লাহকে আমার প্রভু হিসাবে, ইসলামকে আমার ধর্ম হিসাবে এবং মুহাম্মাদকে আমার নবী হিসাবে মেনে চাই।",
+      "defaultCount": 3
     }
   ],
   "after_salah": [
     {
       "key": "dhikr-after-01",
-      "titleEn": "After Salah",
-      "titleBn": "নামাজের পর",
-      "arabic": "لَا إِلٰهَ إِلَّا اللَّهُ",
-      "en": "There is no god but Allah.",
-      "bn": "আল্লাহ ছাড়া কোনো ইলাহ নেই।",
+      "titleEn": "La ilaha illallah",
+      "titleBn": "লা ইলাহা ইল্লাল্লাহ",
+      "arabic": "لَا إِلٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ",
+      "en": "There is no god but Allah alone, with no partner for Him.",
+      "bn": "আল্লাহ ছাড়া কোনো ইলাহ নেই, একা, তাঁর কোনো অংশীদার নেই।",
       "defaultCount": 33
+    },
+    {
+      "key": "dhikr-after-02",
+      "titleEn": "Alhamdulillah",
+      "titleBn": "আলহামদুলিল্লাহ",
+      "arabic": "الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ",
+      "en": "All praise is due to Allah, Lord of the worlds.",
+      "bn": "সমস্ত প্রশংসা আল্লাহর জন্য, বিশ্বজগতের প্রভু।",
+      "defaultCount": 33
+    },
+    {
+      "key": "dhikr-after-03",
+      "titleEn": "Allahu Akbar",
+      "titleBn": "আল্লাহু আকবার",
+      "arabic": "اللَّهُ أَكْبَرُ كَبِيرًا",
+      "en": "Allah is the Greatest, the Greatest.",
+      "bn": "আল্লাহ অত্যন্ত মহান।",
+      "defaultCount": 33
+    }
+  ],
+  "tasbih": [
+    {
+      "key": "dhikr-tasbih-01",
+      "titleEn": "Tasbih (100x)",
+      "titleBn": "তাসবীহ (১০০ বার)",
+      "arabic": "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ سُبْحَانَ اللَّهِ الْعَظِيمِ",
+      "en": "Glorify Allah and praise Him. Glorify Allah, the Mighty.",
+      "bn": "আল্লাহকে পবিত্র বলুন এবং তাঁর প্রশংসা করুন। আল্লাহকে পবিত্র বলুন, সর্বশক্তিমান।",
+      "defaultCount": 100
+    }
+  ],
+  "quranic_dhikr": [
+    {
+      "key": "dhikr-quranic-01",
+      "titleEn": "Ayat-ul-Kursi (The Throne Verse)",
+      "titleBn": "আয়াতুল কুর্সী",
+      "arabic": "اللَّهُ لَا إِلٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ",
+      "en": "Allah - there is no deity except Him, the Ever-Living, the Sustainer of existence.",
+      "bn": "আল্লাহ—তিনি ছাড়া কোনো ইলাহ নেই, জীবন্ত, সমস্ত কিছু পরিচালনাকারী।",
+      "defaultCount": 1
+    },
+    {
+      "key": "dhikr-quranic-02",
+      "titleEn": "Ayat-ul-Qursi Full",
+      "titleBn": "আয়াতুল কুর্সী সম্পূর্ণ",
+      "arabic": "بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ",
+      "en": "In the Name of Allah, the Merciful, the Compassionate.",
+      "bn": "আল্লাহর সুদয়ের, দয়াময়ের নামে শুরু।",
+      "defaultCount": 1
+    }
+  ],
+  "adhkar_of_ummah": [
+    {
+      "key": "dhikr-ummah-01",
+      "titleEn": "Adhkar of Ummu Habibah",
+      "titleBn": "উম্মু হাবিবার যিকির",
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَة",
+      "en": "O Allah, I ask You for pardon and well-being.",
+      "bn": "হে আল্লাহ, আমি আপনার কাছে ক্ষমা এবং সুস্বাস্থ্য চাই।",
+      "defaultCount": 1
+    },
+    {
+      "key": "dhikr-ummah-02",
+      "titleEn": "Dua of Abdullah ibn Abbas",
+      "titleBn": "আব্দুল্লাহ ইবন আব্বাসের দোয়া",
+      "arabic": "اللَّهُمَّ اجْعَلْ لِي نُورًا فِي قَلْبِي",
+      "en": "O Allah, place light in my heart.",
+      "bn": "হে আল্লাহ, আমার হৃদয়ে আলো স্থাপন করুন।",
+      "defaultCount": 3
     }
   ]
 }
-

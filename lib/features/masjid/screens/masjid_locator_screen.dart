@@ -6,11 +6,13 @@ import '../../location/screens/mosque_map_screen.dart';
 class MasjidLocatorScreen extends StatefulWidget {
   final AppLanguage language;
   final LocationService locationService;
+  final String? googleApiKey;
 
   const MasjidLocatorScreen({
     super.key,
     required this.language,
     required this.locationService,
+    this.googleApiKey,
   });
 
   @override
@@ -20,6 +22,10 @@ class MasjidLocatorScreen extends StatefulWidget {
 class _MasjidLocatorScreenState extends State<MasjidLocatorScreen> {
   @override
   Widget build(BuildContext context) {
-    return MosqueMapScreen(language: widget.language);
+    return MosqueMapScreen(
+      language: widget.language,
+      locationService: widget.locationService,
+      googleApiKey: widget.googleApiKey,
+    );
   }
 }

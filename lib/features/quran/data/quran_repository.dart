@@ -1,294 +1,244 @@
 import 'dart:convert';
-
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../core/models/app_enums.dart';
 import 'quran_models.dart';
 
 class QuranRepository {
-  static const _kBookmarks = 'quran_bookmarks';
-  static const _kCachedQuran = 'cached_quran_data';
+  static const _kCachedSurahList = 'cached_surah_list';
+  static const _kCachedSurah = 'cached_surah_';
+  static const _kBookmarkedAyahs = 'bookmarked_ayahs';
+  static const _kDailyAyah = 'daily_ayah';
+  static const _kDailyAyahDate = 'daily_ayah_date';
 
-  /// Fetch complete Quran from API with fallback to local data
-  Future<QuranData> loadQuranData() async {
+  /// Fetch all Surah metadata
+  Future<List<Surah>> fetchSurahList() async {
     try {
-      return await _fetchFromAPI();
-    } catch (e) {
-      print('API fetch failed, falling back to local data: $e');
-      return loadOfflineData();
-    }
-  }
+      final prefs = await SharedPreferences.getInstance();
 
-  /// Fetch Quran from Al-Quran Cloud API
-  Future<QuranData> _fetchFromAPI() async {
-    final prefs = await SharedPreferences.getInstance();
-    
-    // Check if cached data exists
-    final cachedData = prefs.getString(_kCachedQuran);
-    if (cachedData != null) {
-      try {
-        return _parseQuranData(jsonDecode(cachedData) as Map<String, dynamic>);
-      } catch (e) {
-        print('Error parsing cached data: $e');
-      }
-    }
-
-    // Fetch Arabic text
-    final arabicResponse = await http.get(
-      Uri.parse('https://api.alquran.cloud/v1/quran/quran-uthmani'),
-    ).timeout(const Duration(seconds: 15));
-
-    if (arabicResponse.statusCode != 200) {
-      throw Exception('Failed to fetch Arabic Quran');
-    }
-
-    final arabicData = jsonDecode(arabicResponse.body);
-
-    // Fetch English translation
-    final englishResponse = await http.get(
-      Uri.parse('https://api.alquran.cloud/v1/quran/en.asad'),
-    ).timeout(const Duration(seconds: 15));
-
-    if (englishResponse.statusCode != 200) {
-      throw Exception('Failed to fetch English Quran');
-    }
-
-    final englishData = jsonDecode(englishResponse.body);
-
-    // Fetch Bengali translation
-    final bengaliResponse = await http.get(
-      Uri.parse('https://api.alquran.cloud/v1/quran/bn.bengali'),
-    ).timeout(const Duration(seconds: 15));
-
-    if (bengaliResponse.statusCode != 200) {
-      throw Exception('Failed to fetch Bengali Quran');
-    }
-
-    final bengaliData = jsonDecode(bengaliResponse.body);
-
-    // Merge data and cache it
-    final mergedData = _mergeQuranData(
-      arabicData['data'] as Map<String, dynamic>,
-      englishData['data'] as Map<String, dynamic>,
-      bengaliData['data'] as Map<String, dynamic>,
-    );
-
-    // Cache the data
-    await prefs.setString(_kCachedQuran, jsonEncode(mergedData));
-
-    return _parseQuranData(mergedData);
-  }
-
-  /// Merge Arabic, English, and Bengali Quran data
-  Map<String, dynamic> _mergeQuranData(
-    Map<String, dynamic> arabicData,
-    Map<String, dynamic> englishData,
-    Map<String, dynamic> bengaliData,
-  ) {
-    final arabicSurahs = arabicData['surahs'] as List;
-    final englishSurahs = englishData['surahs'] as List;
-    final bengaliSurahs = bengaliData['surahs'] as List;
-
-    final mergedSurahs = <Map<String, dynamic>>[];
-
-    for (int i = 0; i < arabicSurahs.length; i++) {
-      final arabicSurah = arabicSurahs[i] as Map<String, dynamic>;
-      final englishSurah = englishSurahs[i] as Map<String, dynamic>;
-      final bengaliSurah = bengaliSurahs[i] as Map<String, dynamic>;
-
-      final arabicAyahs = (arabicSurah['ayahs'] as List?) ?? [];
-      final englishAyahs = (englishSurah['ayahs'] as List?) ?? [];
-      final bengaliAyahs = (bengaliSurah['ayahs'] as List?) ?? [];
-
-      final mergedAyahs = <Map<String, dynamic>>[];
-
-      for (int j = 0; j < arabicAyahs.length; j++) {
-        final arabicAyah = arabicAyahs[j] as Map<String, dynamic>;
-        final englishAyah =
-            j < englishAyahs.length ? englishAyahs[j] as Map<String, dynamic> : {};
-        final bengaliAyah =
-            j < bengaliAyahs.length ? bengaliAyahs[j] as Map<String, dynamic> : {};
-
-        mergedAyahs.add({
-          'number': arabicAyah['numberInSurah'] ?? (j + 1),
-          'arabic': arabicAyah['text'] ?? '',
-          'en': englishAyah['text'] ?? '',
-          'bn': bengaliAyah['text'] ?? '',
-        });
+      // Check cache first
+      final cached = prefs.getString(_kCachedSurahList);
+      if (cached != null) {
+        final List<dynamic> decoded = jsonDecode(cached);
+        return decoded
+            .map((s) => Surah.fromJson(s as Map<String, dynamic>))
+            .toList();
       }
 
-      mergedSurahs.add({
-        'id': arabicSurah['number'],
-        'nameEn': arabicSurah['englishName'] ?? '',
-        'nameBn': arabicSurah['name'] ?? '',
-        'nameAr': arabicSurah['name'] ?? '',
-        'ayahCount': arabicSurah['numberOfAyahs'],
-        'ayahs': mergedAyahs,
-      });
-    }
-
-    return {'surahs': mergedSurahs};
-  }
-
-  /// Parse merged Quran data into QuranData model
-  QuranData _parseQuranData(Map<String, dynamic> data) {
-    final surahsDecoded = (data['surahs'] as List).cast<Map<String, dynamic>>();
-
-    final surahs = <QuranSurah>[];
-    for (final s in surahsDecoded) {
-      final ayahsDecoded = (s['ayahs'] as List?)?.cast<Map<String, dynamic>>() ?? [];
-
-      final ayahs = ayahsDecoded
-          .map(
-            (a) => QuranAyah(
-              number: a['number'] as int,
-              arabic: a['arabic'] as String? ?? '',
-              en: a['en'] as String? ?? '',
-              bn: a['bn'] as String? ?? '',
-            ),
+      // Fetch from API
+      final response = await http
+          .get(
+            Uri.parse('https://api.alquran.cloud/v1/surah'),
           )
-          .toList();
+          .timeout(const Duration(seconds: 10));
 
-      surahs.add(
-        QuranSurah(
-          id: s['id'] as int,
-          nameEn: s['nameEn'] as String? ?? '',
-          nameBn: s['nameBn'] as String? ?? '',
-          ayahs: ayahs,
-          ayahCount: s['ayahCount'] as int?,
-        ),
-      );
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        final surahsJson =
+            (data['data'] as List?)?.cast<Map<String, dynamic>>() ?? [];
+        final surahs = surahsJson.map((s) => Surah.fromJson(s)).toList();
+
+        // Add Bengali names
+        for (var surah in surahs) {
+          surah.nameBengali =
+              bengaliSurahNames[surah.number] ?? surah.nameEnglish;
+        }
+
+        // Cache the list
+        await prefs.setString(
+          _kCachedSurahList,
+          jsonEncode(surahsJson),
+        );
+
+        return surahs;
+      } else {
+        throw Exception('Failed to load surah list: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching surah list: $e');
+      return [];
     }
-
-    return QuranData(surahs: surahs);
   }
 
-  Future<QuranData> loadOfflineData() async {
-    final raw = await rootBundle.loadString('assets/quran/complete_quran.json');
-    final decoded = jsonDecode(raw) as Map<String, dynamic>;
-    final surahsDecoded = (decoded['surahs'] as List).cast<Map<String, dynamic>>();
-    final ayahsDataRaw = decoded['ayahs_data'] as Map<String, dynamic>? ?? {};
+  /// Fetch complete Surah with ayahs (Arabic + English Transliteration + Bengali Translation)
+  Future<Map<String, dynamic>> fetchSurah(int surahNumber) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final cacheKey = '$_kCachedSurah$surahNumber';
 
-    final surahs = <QuranSurah>[];
-    for (final s in surahsDecoded) {
-      // First try to get ayahs from within surah object (for backward compatibility)
-      var ayahsDecoded = (s['ayahs'] as List?)?.cast<Map<String, dynamic>>() ?? [];
-      
-      // If no ayahs in surah, try to get from ayahs_data using surah id
-      if (ayahsDecoded.isEmpty) {
-        final surahId = (s['id'] as int).toString();
-        final ayahsFromData = ayahsDataRaw[surahId] as List?;
-        if (ayahsFromData != null) {
-          ayahsDecoded = ayahsFromData.cast<Map<String, dynamic>>();
+      // Check cache first
+      final cached = prefs.getString(cacheKey);
+      if (cached != null) {
+        return jsonDecode(cached) as Map<String, dynamic>;
+      }
+
+      // Fetch from multiple endpoints
+      final arabicResponse = await http
+          .get(
+            Uri.parse('https://api.alquran.cloud/v1/surah/$surahNumber'),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      final bengaliResponse = await http
+          .get(
+            Uri.parse(
+                'https://api.alquran.cloud/v1/surah/$surahNumber/bn.bengali'),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (arabicResponse.statusCode == 200 &&
+          bengaliResponse.statusCode == 200) {
+        final arabicData =
+            jsonDecode(arabicResponse.body) as Map<String, dynamic>;
+        final bengaliData =
+            jsonDecode(bengaliResponse.body) as Map<String, dynamic>;
+
+        final arabicAyahs = (arabicData['data']?['ayahs'] as List?) ?? [];
+        final bengaliAyahs = (bengaliData['data']?['ayahs'] as List?) ?? [];
+
+        // Merge data
+        final mergedAyahs = <Map<String, dynamic>>[];
+        for (int i = 0; i < arabicAyahs.length; i++) {
+          final arabicAyah = Map<String, dynamic>.from(arabicAyahs[i] as Map);
+          arabicAyah['bengaliTranslation'] =
+              bengaliAyahs.isNotEmpty && i < bengaliAyahs.length
+                  ? (bengaliAyahs[i] as Map)['text']
+                  : '';
+          mergedAyahs.add(arabicAyah);
+        }
+
+        final result = {
+          'surah': arabicData['data'],
+          'ayahs': mergedAyahs,
+        };
+
+        // Cache it
+        await prefs.setString(cacheKey, jsonEncode(result));
+        return result;
+      } else {
+        throw Exception('Failed to fetch surah');
+      }
+    } catch (e) {
+      print('Error fetching surah $surahNumber: $e');
+      return {};
+    }
+  }
+
+  /// Fetch English transliteration for a specific ayah
+  Future<String> fetchAyahTransliteration(
+      int surahNumber, int ayahNumber) async {
+    try {
+      final response = await http
+          .get(
+            Uri.parse(
+                'https://api.quran.com/api/v4/quran/verses/uthmani?chapter_number=$surahNumber&verse_number=$ayahNumber'),
+          )
+          .timeout(const Duration(seconds: 5));
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        final verses = (data['verses'] as List?) ?? [];
+        if (verses.isNotEmpty) {
+          final verseData = verses[0] as Map<String, dynamic>;
+          // Try to get transliteration from additional fields
+          return verseData['transliteration'] as String? ?? '';
+        }
+      }
+    } catch (e) {
+      print('Error fetching transliteration: $e');
+    }
+    return '';
+  }
+
+  /// Toggle bookmark for ayah
+  Future<void> toggleBookmark(int surahNumber, int ayahNumber) async {
+    final prefs = await SharedPreferences.getInstance();
+    final bookmarks = prefs.getStringList(_kBookmarkedAyahs) ?? [];
+    final key = '$surahNumber:$ayahNumber';
+
+    if (bookmarks.contains(key)) {
+      bookmarks.remove(key);
+    } else {
+      bookmarks.add(key);
+    }
+
+    await prefs.setStringList(_kBookmarkedAyahs, bookmarks);
+  }
+
+  /// Get all bookmarked ayahs
+  Future<List<String>> getBookmarks() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getStringList(_kBookmarkedAyahs) ?? [];
+  }
+
+  /// Check if ayah is bookmarked
+  Future<bool> isBookmarked(int surahNumber, int ayahNumber) async {
+    final bookmarks = await getBookmarks();
+    return bookmarks.contains('$surahNumber:$ayahNumber');
+  }
+
+  /// Get ayah of the day
+  Future<Map<String, dynamic>> getAyahOfDay() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final today = DateTime.now().toIso8601String().split('T')[0];
+      final lastDate = prefs.getString(_kDailyAyahDate);
+
+      // Return cached ayah if same day
+      if (lastDate == today) {
+        final cached = prefs.getString(_kDailyAyah);
+        if (cached != null) {
+          return jsonDecode(cached) as Map<String, dynamic>;
         }
       }
 
-      final ayahs = ayahsDecoded
-          .map(
-            (a) => QuranAyah(
-              number: a['number'] as int,
-              arabic: a['arabic'] as String? ?? '',
-              en: a['en'] as String? ?? '',
-              bn: a['bn'] as String? ?? '',
-            ),
-          )
-          .toList();
+      // Select random ayah
+      final random =
+          DateTime.now().millisecondsSinceEpoch % 6236; // Total ayahs in Quran
+      final surahList = await fetchSurahList();
 
-      surahs.add(
-        QuranSurah(
-          id: s['id'] as int,
-          nameEn: s['nameEn'] as String,
-          nameBn: s['nameBn'] as String,
-          ayahs: ayahs,
-          ayahCount: s['ayahCount'] as int?,
-        ),
-      );
-    }
-
-    return QuranData(surahs: surahs);
-  }
-
-  Future<QuranBookmark?> getBookmarkFor({
-    required int surahId,
-    required int ayahNumber,
-  }) async {
-    final prefs = await SharedPreferences.getInstance();
-    final raw = prefs.getString(_kBookmarks);
-    if (raw == null) return null;
-    final list = (jsonDecode(raw) as List).cast<Map<String, dynamic>>();
-    for (final item in list) {
-      if (item['surahId'] == surahId && item['ayahNumber'] == ayahNumber) {
-        return QuranBookmark(surahId: surahId, ayahNumber: ayahNumber);
+      int currentIndex = 0;
+      for (final surah in surahList) {
+        if (currentIndex + surah.ayahCount > random) {
+          final ayahNum = random - currentIndex + 1;
+          final surahData = await fetchSurah(surah.number);
+          final ayahs = surahData['ayahs'] as List? ?? [];
+          if (ayahs.isNotEmpty && ayahNum <= ayahs.length) {
+            final ayah = ayahs[ayahNum - 1];
+            final result = {
+              'surah_number': surah.number,
+              'surah_name': surah.nameBengali,
+              'ayah_number': ayahNum,
+              'ayah': ayah,
+            };
+            await prefs.setString(_kDailyAyah, jsonEncode(result));
+            await prefs.setString(_kDailyAyahDate, today);
+            return result;
+          }
+        }
+        currentIndex += surah.ayahCount;
       }
+
+      return {};
+    } catch (e) {
+      print('Error getting ayah of day: $e');
+      return {};
     }
-    return null;
   }
 
-  Future<void> toggleBookmark(QuranBookmark bookmark) async {
-    final prefs = await SharedPreferences.getInstance();
-    final raw = prefs.getString(_kBookmarks);
-    final list = <Map<String, dynamic>>[];
-    if (raw != null && raw.isNotEmpty) {
-      list.addAll((jsonDecode(raw) as List).cast<Map<String, dynamic>>());
+  /// Load offline data (fallback)
+  Future<QuranData> loadOfflineData() async {
+    try {
+      final jsonString =
+          await rootBundle.loadString('assets/quran/sample_quran.json');
+      final jsonData = jsonDecode(jsonString) as Map<String, dynamic>;
+      return QuranData.fromJson(jsonData);
+    } catch (e) {
+      print('Error loading offline quran data: $e');
+      return QuranData(surahs: [], ayahs: {});
     }
-
-    final exists = list.any((item) =>
-        item['surahId'] == bookmark.surahId &&
-        item['ayahNumber'] == bookmark.ayahNumber);
-
-    if (exists) {
-      list.removeWhere((item) =>
-          item['surahId'] == bookmark.surahId &&
-          item['ayahNumber'] == bookmark.ayahNumber);
-    } else {
-      list.add({
-        'surahId': bookmark.surahId,
-        'ayahNumber': bookmark.ayahNumber,
-      });
-    }
-
-    await prefs.setString(_kBookmarks, jsonEncode(list));
-  }
-
-  Future<List<QuranBookmark>> loadBookmarks() async {
-    final prefs = await SharedPreferences.getInstance();
-    final raw = prefs.getString(_kBookmarks);
-    if (raw == null || raw.isEmpty) return [];
-    final list = (jsonDecode(raw) as List).cast<Map<String, dynamic>>();
-    return list
-        .map(
-          (item) => QuranBookmark(
-            surahId: item['surahId'] as int,
-            ayahNumber: item['ayahNumber'] as int,
-          ),
-        )
-        .toList();
-  }
-
-  Future<QuranAyah> getAyahOfDay({
-    required QuranData data,
-    required DateTime date,
-  }) async {
-    final allAyahs = <QuranAyah>[];
-    for (final s in data.surahs) {
-      allAyahs.addAll(s.ayahs);
-    }
-    if (allAyahs.isEmpty) {
-      throw StateError('No offline Quran ayahs found.');
-    }
-
-    final dayOfYear = date.difference(DateTime(date.year, 1, 1)).inDays;
-    final idx = dayOfYear % allAyahs.length;
-    return allAyahs[idx];
-  }
-
-  String localizedTranslation({
-    required QuranAyah ayah,
-    required AppLanguage language,
-  }) {
-    return language == AppLanguage.bn ? ayah.bn : ayah.en;
   }
 }
 
+// No custom debugPrint - using standard print()
