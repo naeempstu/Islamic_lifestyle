@@ -6,12 +6,14 @@ import '../../core/models/app_enums.dart';
 class HeaderSection extends StatelessWidget {
   final AppLanguage language;
   final VoidCallback onSettingsTap;
+  final VoidCallback onCalendarTap;
   final VoidCallback onRamadanTap;
 
   const HeaderSection({
     super.key,
     required this.language,
     required this.onSettingsTap,
+    required this.onCalendarTap,
     required this.onRamadanTap,
   });
 
@@ -168,23 +170,34 @@ class HeaderSection extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Text(
-                      currentDate,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.8),
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                      ),
+                InkWell(
+                  onTap: onCalendarTap,
+                  borderRadius: BorderRadius.circular(10),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 4,
+                      vertical: 2,
                     ),
-                    const SizedBox(width: 6),
-                    Icon(
-                      Icons.calendar_today_outlined,
-                      color: Colors.white.withValues(alpha: 0.7),
-                      size: 13,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          currentDate,
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.8),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Icon(
+                          Icons.calendar_today_outlined,
+                          color: Colors.white.withValues(alpha: 0.7),
+                          size: 13,
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(

@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 
 import '../core/models/app_enums.dart';
 import '../core/models/app_settings.dart';
 import '../core/services/location_service.dart';
 import '../core/services/notification_service.dart';
+import '../features/calendar/screens/calendar_screen.dart';
 import '../features/dhikr/data/dhikr_repository.dart';
 import '../features/duas/data/duas_repository.dart';
 import '../features/halal/screens/halal_guide_screen.dart';
-import '../features/home/screens/home_screen.dart';
+import '../screens/home/home_screen_new.dart';
 
 import '../features/prayer/services/prayer_times_service.dart';
 
@@ -17,16 +19,14 @@ import '../features/routine/data/daily_routine_store.dart';
 import '../features/routine/screens/habits_screen.dart';
 import '../features/ramadan/screens/ramadan_screen.dart';
 import '../features/settings/screens/settings_screen.dart';
-import '../features/dhikr/screens/dhikr_screen.dart';
 import '../features/tasbih/screens/tasbih_only_screen.dart';
-import '../features/masjid/screens/masjid_locator_screen.dart';
 import '../features/deen_shiksha/screens/deen_shiksha_screen.dart';
-import '../features/hadith/data/hadith_repository.dart';
+import '../features/dhikr/screens/dhikr_screen.dart';
 import '../features/hadith/screens/hadith_reader_screen.dart';
 import '../features/ai_chat/screens/ai_chat_screen.dart';
 import '../features/duas/screens/duas_screen.dart';
-import '../features/quran/data/quran_repository.dart';
 import '../features/quran/screens/quran_list_screen.dart';
+import '../widgets/quick_access_grid.dart';
 
 class MainShell extends StatefulWidget {
   final AppSettings settings;
@@ -36,11 +36,6 @@ class MainShell extends StatefulWidget {
   final PrayerTimesService prayerTimesService;
   final DailyRoutineStore routineStore;
 
-  final DhikrRepository dhikrRepository;
-  final DuasRepository duasRepository;
-  final HadithRepository hadithRepository;
-  final QuranRepository quranRepository;
-
   const MainShell({
     super.key,
     required this.settings,
@@ -48,10 +43,6 @@ class MainShell extends StatefulWidget {
     required this.locationService,
     required this.prayerTimesService,
     required this.routineStore,
-    required this.dhikrRepository,
-    required this.duasRepository,
-    required this.hadithRepository,
-    required this.quranRepository,
   });
 
   @override
@@ -60,6 +51,20 @@ class MainShell extends StatefulWidget {
 
 class _MainShellState extends State<MainShell> {
   int _index = 0;
+
+  static const SystemUiOverlayStyle _lightStatusBar =
+      SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
+      );
+
+  static const SystemUiOverlayStyle _darkStatusBar =
+      SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+      );
 
   @override
   void initState() {
@@ -104,27 +109,9 @@ class _MainShellState extends State<MainShell> {
     }
   }
 
-  Future<void> _onHomeQuickAction(HomeQuickAction action) async {
+  Future<void> _onHomeQuickAccess(QuickAccessAction action) async {
     switch (action) {
-      case HomeQuickAction.tasbih:
-        await Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => TasbihOnlyScreen(
-              language: widget.settings.language,
-              vibrationEnabled: widget.settings.vibrationEnabled,
-            ),
-          ),
-        );
-        break;
-      case HomeQuickAction.halal:
-        await Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) =>
-                HalalGuideScreen(language: widget.settings.language),
-          ),
-        );
-        break;
-      case HomeQuickAction.qibla:
+      case QuickAccessAction.qibla:
         await Navigator.of(context).push(
           MaterialPageRoute(
             builder: (_) => QiblaScreen(
@@ -134,28 +121,35 @@ class _MainShellState extends State<MainShell> {
           ),
         );
         break;
-      case HomeQuickAction.masjid:
+      case QuickAccessAction.tasbih:
         await Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (_) => MasjidLocatorScreen(
+            builder: (_) => TasbihOnlyScreen(
               language: widget.settings.language,
-              locationService: widget.locationService,
+              vibrationEnabled: widget.settings.vibrationEnabled,
             ),
           ),
         );
         break;
-      case HomeQuickAction.nearestMosque:
-        // Handled directly in HomeScreen, no action needed here
-        break;
-      case HomeQuickAction.deenShiksha:
+      case QuickAccessAction.dhikr:
         await Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (_) =>
-                DeenShikshaScreen(language: widget.settings.language),
+            builder: (_) => DhikrScreen(
+              language: widget.settings.language,
+              vibrationEnabled: widget.settings.vibrationEnabled,
+              dhikrRepository: DhikrRepository(),
+            ),
           ),
         );
         break;
-      case HomeQuickAction.hadith:
+      case QuickAccessAction.quran:
+        await Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => const QuranListScreen(),
+          ),
+        );
+        break;
+      case QuickAccessAction.hadith:
         await Navigator.of(context).push(
           MaterialPageRoute(
             builder: (_) => HadithReaderScreen(
@@ -164,31 +158,33 @@ class _MainShellState extends State<MainShell> {
           ),
         );
         break;
-      case HomeQuickAction.duas:
+      case QuickAccessAction.duas:
         await Navigator.of(context).push(
           MaterialPageRoute(
             builder: (_) => DuasScreen(
               language: widget.settings.language,
-              repository: widget.duasRepository,
+              repository: DuasRepository(),
             ),
           ),
         );
         break;
-      case HomeQuickAction.dhikr:
+      case QuickAccessAction.nearestMosque:
+        break;
+      case QuickAccessAction.halal:
         await Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (_) => DhikrScreen(
+            builder: (_) => HalalGuideScreen(
               language: widget.settings.language,
-              vibrationEnabled: widget.settings.vibrationEnabled,
-              dhikrRepository: widget.dhikrRepository,
             ),
           ),
         );
         break;
-      case HomeQuickAction.quran:
+      case QuickAccessAction.deen:
         await Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (_) => const QuranListScreen(),
+            builder: (_) => DeenShikshaScreen(
+              language: widget.settings.language,
+            ),
           ),
         );
         break;
@@ -245,18 +241,28 @@ class _MainShellState extends State<MainShell> {
           );
         },
       ),
-      body: SafeArea(
-        child: IndexedStack(
-          index: _index,
-          children: [
-            HomeScreen(
+      body: IndexedStack(
+        index: _index,
+        children: [
+          AnnotatedRegion<SystemUiOverlayStyle>(
+            value: _lightStatusBar,
+            child: HomeScreenNew(
               language: lang,
               prayerCalculationMethod: widget.settings.prayerCalculationMethod,
               locationService: widget.locationService,
               prayerTimesService: widget.prayerTimesService,
               alarmEnabled: widget.settings.notificationsEnabled,
               onAlarmToggle: _toggleAlarm,
-              onQuickAccessTap: _onHomeQuickAction,
+              onQuickAccessTap: _onHomeQuickAccess,
+              onOpenCalendar: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => CalendarScreen(
+                      language: lang,
+                    ),
+                  ),
+                );
+              },
               onOpenRamadan: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
@@ -286,11 +292,25 @@ class _MainShellState extends State<MainShell> {
                 );
               },
             ),
-            QuranListScreen(),
-            HabitsScreen(language: lang, routineStore: widget.routineStore),
-            const AIChatScreen(),
-          ],
-        ),
+          ),
+          AnnotatedRegion<SystemUiOverlayStyle>(
+            value: _darkStatusBar,
+            child: SafeArea(child: QuranListScreen()),
+          ),
+          AnnotatedRegion<SystemUiOverlayStyle>(
+            value: _darkStatusBar,
+            child: SafeArea(
+              child: HabitsScreen(
+                language: lang,
+                routineStore: widget.routineStore,
+              ),
+            ),
+          ),
+          const AnnotatedRegion<SystemUiOverlayStyle>(
+            value: _darkStatusBar,
+            child: SafeArea(child: AIChatScreen()),
+          ),
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,

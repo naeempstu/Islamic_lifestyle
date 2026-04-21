@@ -4,6 +4,7 @@ import '../../core/models/app_enums.dart';
 enum QuickAccessAction {
   qibla,
   tasbih,
+  dhikr,
   quran,
   hadith,
   duas,
@@ -26,6 +27,7 @@ class QuickAccessGrid extends StatelessWidget {
     const labels = {
       QuickAccessAction.qibla: {'en': 'Qibla\nDirection', 'bn': 'কিবলা\nদিক'},
       QuickAccessAction.tasbih: {'en': 'Tasbih', 'bn': 'তাসবিহ'},
+      QuickAccessAction.dhikr: {'en': 'Dhikr', 'bn': 'যিকির'},
       QuickAccessAction.quran: {'en': 'Quran', 'bn': 'কুরআন'},
       QuickAccessAction.hadith: {'en': 'Hadith', 'bn': 'হাদিস'},
       QuickAccessAction.duas: {'en': 'Duas', 'bn': 'দোয়া'},
@@ -52,6 +54,11 @@ class QuickAccessGrid extends StatelessWidget {
         'action': QuickAccessAction.tasbih,
         'icon': Icons.self_improvement_outlined,
         'colors': const [Color(0xFF8b5cf6), Color(0xFF7c3aed)],
+      },
+      {
+        'action': QuickAccessAction.dhikr,
+        'icon': Icons.auto_awesome_outlined,
+        'colors': const [Color(0xFF14b8a6), Color(0xFF0f766e)],
       },
       {
         'action': QuickAccessAction.quran,

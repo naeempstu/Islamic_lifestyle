@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -20,7 +21,9 @@ class HomeScreenNew extends StatefulWidget {
   final PrayerTimesService prayerTimesService;
   final bool alarmEnabled;
   final ValueChanged<bool> onAlarmToggle;
+  final ValueChanged<QuickAccessAction> onQuickAccessTap;
   final VoidCallback onOpenSettings;
+  final VoidCallback onOpenCalendar;
   final VoidCallback onOpenRamadan;
 
   const HomeScreenNew({
@@ -31,7 +34,9 @@ class HomeScreenNew extends StatefulWidget {
     required this.prayerTimesService,
     required this.alarmEnabled,
     required this.onAlarmToggle,
+    required this.onQuickAccessTap,
     required this.onOpenSettings,
+    required this.onOpenCalendar,
     required this.onOpenRamadan,
   });
 
@@ -40,6 +45,13 @@ class HomeScreenNew extends StatefulWidget {
 }
 
 class _HomeScreenNewState extends State<HomeScreenNew> {
+  static const SystemUiOverlayStyle _homeStatusBar =
+      SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
+      );
+
   late HomeProvider _homeProvider;
 
   @override
@@ -67,28 +79,17 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
   void _handleQuickAccess(QuickAccessAction action) {
     switch (action) {
       case QuickAccessAction.qibla:
-        // Navigate to Qibla screen
-        break;
       case QuickAccessAction.tasbih:
-        // Navigate to Tasbih screen
-        break;
+      case QuickAccessAction.dhikr:
       case QuickAccessAction.quran:
-        // Navigate to Quran screen
-        break;
       case QuickAccessAction.hadith:
-        // Navigate to Hadith screen
-        break;
       case QuickAccessAction.duas:
-        // Navigate to Duas screen
+      case QuickAccessAction.halal:
+      case QuickAccessAction.deen:
+        widget.onQuickAccessTap(action);
         break;
       case QuickAccessAction.nearestMosque:
         _openNearestMosque();
-        break;
-      case QuickAccessAction.halal:
-        // Navigate to Halal screen
-        break;
-      case QuickAccessAction.deen:
-        // Navigate to Deen Education screen
         break;
     }
   }
@@ -124,19 +125,22 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
 
     return ChangeNotifierProvider<HomeProvider>.value(
       value: _homeProvider,
-      child: Scaffold(
-        extendBodyBehindAppBar: true,
-        body: RefreshIndicator(
-          onRefresh: _handleRefresh,
-          child: Consumer<HomeProvider>(
-            builder: (context, homeProvider, _) {
-              return CustomScrollView(
-                slivers: [
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: _homeStatusBar,
+        child: Scaffold(
+          extendBodyBehindAppBar: true,
+          body: RefreshIndicator(
+            onRefresh: _handleRefresh,
+            child: Consumer<HomeProvider>(
+              builder: (context, homeProvider, _) {
+                return CustomScrollView(
+                  slivers: [
                   // Header
                   SliverToBoxAdapter(
                     child: HeaderSection(
                       language: widget.language,
                       onSettingsTap: widget.onOpenSettings,
+                      onCalendarTap: widget.onOpenCalendar,
                       onRamadanTap: widget.onOpenRamadan,
                     ),
                   ),
@@ -168,6 +172,11 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
 
                           // Prayer Times Section
                           if (homeProvider.prayerTimes != null) ...[
+                            CurrentPrayerCard(
+                              language: widget.language,
+                              times: homeProvider.prayerTimes!,
+                            ),
+                            const SizedBox(height: 16),
                             PrayerTimesCard(
                               language: widget.language,
                               times: homeProvider.prayerTimes!,
@@ -277,9 +286,10 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
                   SliverToBoxAdapter(
                     child: const SizedBox(height: 20),
                   ),
-                ],
-              );
-            },
+                  ],
+                );
+              },
+            ),
           ),
         ),
       ),

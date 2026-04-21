@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../core/models/app_settings.dart';
 import '../core/services/firebase_init.dart';
@@ -7,11 +8,7 @@ import '../core/services/notification_service.dart';
 import '../core/services/push_notification_service.dart';
 import '../core/storage/app_prefs.dart';
 import '../core/theme/app_theme.dart';
-import '../features/dhikr/data/dhikr_repository.dart';
-import '../features/duas/data/duas_repository.dart';
 import '../features/prayer/services/prayer_times_service.dart';
-import '../features/hadith/data/hadith_repository.dart';
-import '../features/quran/data/quran_repository.dart';
 import '../features/routine/data/daily_routine_store.dart';
 import '../features/onboarding/screens/onboarding_screen.dart';
 import 'main_shell.dart';
@@ -32,6 +29,13 @@ class _IslamicLifestyleAppState extends State<IslamicLifestyleApp> {
   @override
   void initState() {
     super.initState();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        systemNavigationBarColor: Colors.transparent,
+      ),
+    );
     _bootstrap();
   }
 
@@ -137,10 +141,6 @@ class _IslamicLifestyleAppState extends State<IslamicLifestyleApp> {
               locationService: LocationService(),
               prayerTimesService: PrayerTimesService.instance,
               routineStore: DailyRoutineStore(),
-              dhikrRepository: DhikrRepository(),
-              duasRepository: DuasRepository(),
-              hadithRepository: HadithRepository(),
-              quranRepository: QuranRepository(),
             )
           : OnboardingScreen(
               prefs: _prefs!,
