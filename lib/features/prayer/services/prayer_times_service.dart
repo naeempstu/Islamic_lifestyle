@@ -15,10 +15,13 @@ class PrayerTimesService {
   }) {
     final coords = Coordinates(latitude, longitude);
     final params = method.toAdhan().getParameters();
-    // Madhhab selection (Shafi/Hanafi) can be added later.
-    // Keeping default madhhab for now to stay simple.
+    final targetDate = date ?? DateTime.now();
 
-    final prayerTimes = PrayerTimes.today(coords, params);
+    // Bangladesh prayer schedules typically follow Hanafi Asr.
+    params.madhab = Madhab.hanafi;
+
+    final prayerTimes =
+        PrayerTimes(coords, DateComponents.from(targetDate), params);
 
     return PrayerTimesModel.fromAdhan(prayerTimes);
   }

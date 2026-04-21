@@ -59,7 +59,7 @@ class HadithBooksScreen extends StatelessWidget {
                           : 'The Six Main Hadith Collections',
                       style: TextStyle(
                         color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.grey[300]
+                            ? Colors.white70
                             : Colors.white70,
                         fontSize: 14,
                       ),
@@ -92,7 +92,7 @@ class HadithBooksScreen extends StatelessWidget {
                     },
                   ),
                 );
-              }).toList(),
+              }),
 
               const SizedBox(height: 20),
 

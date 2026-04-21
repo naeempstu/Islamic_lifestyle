@@ -20,7 +20,7 @@ class _HadithListScreenState extends State<HadithListScreen> {
   final TextEditingController _searchCtrl = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
-  List<HadithItem> _allHadiths = [];
+  final List<HadithItem> _allHadiths = [];
   List<HadithItem> _filteredHadiths = [];
 
   int _currentPage = 1;

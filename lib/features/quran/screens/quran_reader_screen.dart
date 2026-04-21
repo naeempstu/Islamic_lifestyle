@@ -80,7 +80,7 @@ class _QuranReaderScreenState extends State<QuranReaderScreen> {
                 children: [
                   Icon(Icons.error_outline,
                       size: 48,
-                      color: isDark ? Colors.grey[500] : Colors.grey[700]),
+                      color: isDark ? Colors.grey[300] : Colors.grey[700]),
                   const SizedBox(height: 16),
                   Text(
                     'Failed to load surah',
@@ -165,7 +165,7 @@ class _QuranReaderScreenState extends State<QuranReaderScreen> {
                           style: GoogleFonts.amiriQuran(
                             fontSize: 24,
                             height: 2.0,
-                            color: isDark ? Colors.grey[200] : Colors.black87,
+                            color: isDark ? Colors.white : Colors.black87,
                           ),
                         ),
                       ),

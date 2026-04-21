@@ -6,6 +6,13 @@ class AppTheme {
   static const Color beige = Color(0xFFF7F7F5);
   static const Color nightBlue = Color(0xFF071A2B);
 
+  // Dark mode text colors for better visibility
+  static const Color darkModePrimaryText = Colors.white;
+  static const Color darkModeSecondaryText = Color(0xFFDDE0E5); // ~87% white
+  static const Color darkModeTertiaryText = Color(0xFFB3B8BF); // ~70% white
+  static const Color darkModeHintText = Color(0xFF99A0A9); // ~60% white
+  static const Color darkModeDisabledText = Color(0xFF616A73); // ~38% white
+
   static ThemeData light({required bool darkMode}) {
     if (darkMode) return dark();
 
@@ -23,17 +30,21 @@ class AppTheme {
         style: ElevatedButton.styleFrom(
           backgroundColor: green,
           foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           padding: const EdgeInsets.symmetric(vertical: 14),
-          textStyle: GoogleFonts.nunito(fontWeight: FontWeight.w800, fontSize: 18),
+          textStyle:
+              GoogleFonts.nunito(fontWeight: FontWeight.w800, fontSize: 18),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           padding: const EdgeInsets.symmetric(vertical: 14),
           side: const BorderSide(color: green),
-          textStyle: GoogleFonts.nunito(fontWeight: FontWeight.w700, fontSize: 18),
+          textStyle:
+              GoogleFonts.nunito(fontWeight: FontWeight.w700, fontSize: 18),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
@@ -91,18 +102,36 @@ class AppTheme {
       ),
       textTheme: TextTheme(
         bodyMedium: GoogleFonts.nunito(
-          color: Colors.white70,
+          color: darkModeSecondaryText,
         ),
         titleMedium: GoogleFonts.nunito(
-          color: Colors.white70,
+          color: darkModePrimaryText,
           fontWeight: FontWeight.w700,
         ),
         titleLarge: GoogleFonts.nunito(
-          color: Colors.white70,
+          color: darkModePrimaryText,
           fontWeight: FontWeight.w800,
         ),
       ),
     );
   }
-}
 
+  // Helper methods for dynamic color selection in dark mode
+  static Color getTextColor(BuildContext context, {required bool isDark}) {
+    return isDark ? darkModePrimaryText : Colors.black87;
+  }
+
+  static Color getSecondaryTextColor(BuildContext context,
+      {required bool isDark}) {
+    return isDark ? darkModeTertiaryText : Colors.grey[600]!;
+  }
+
+  static Color getBackgroundColor(BuildContext context,
+      {required bool isDark}) {
+    return isDark ? const Color(0xFF1f2937) : Colors.white;
+  }
+
+  static Color getBorderColor(BuildContext context, {required bool isDark}) {
+    return isDark ? Colors.white.withValues(alpha: 0.2) : Colors.grey[300]!;
+  }
+}

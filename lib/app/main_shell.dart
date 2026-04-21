@@ -9,7 +9,7 @@ import '../features/dhikr/data/dhikr_repository.dart';
 import '../features/duas/data/duas_repository.dart';
 import '../features/halal/screens/halal_guide_screen.dart';
 import '../features/home/screens/home_screen.dart';
-import '../features/prayer/screens/prayer_times_screen.dart';
+
 import '../features/prayer/services/prayer_times_service.dart';
 
 import '../features/qibla/screens/qibla_screen.dart';
@@ -286,23 +286,7 @@ class _MainShellState extends State<MainShell> {
                 );
               },
             ),
-            PrayerTimesScreen(
-              language: lang,
-              settings: widget.settings,
-              onSettingsChanged: (s) async {
-                widget.onSettingsChanged(s);
-                // Reschedule azan reminders when toggles change.
-                await _reschedulePrayerNotifications();
-              },
-              locationService: widget.locationService,
-              prayerTimesService: widget.prayerTimesService,
-            ),
-            const QuranListScreen(),
-            DhikrScreen(
-              language: lang,
-              vibrationEnabled: widget.settings.vibrationEnabled,
-              dhikrRepository: widget.dhikrRepository,
-            ),
+            QuranListScreen(),
             HabitsScreen(language: lang, routineStore: widget.routineStore),
             const AIChatScreen(),
           ],
@@ -320,16 +304,8 @@ class _MainShellState extends State<MainShell> {
             label: lang == AppLanguage.bn ? 'হোম' : 'Home',
           ),
           BottomNavigationBarItem(
-            icon: const Icon(Icons.access_time_outlined),
-            label: lang == AppLanguage.bn ? 'নামাজ' : 'Prayer',
-          ),
-          BottomNavigationBarItem(
             icon: const Icon(Icons.menu_book_outlined),
             label: lang == AppLanguage.bn ? 'কুরআন' : "Qur'an",
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.self_improvement_outlined),
-            label: lang == AppLanguage.bn ? 'যিকির' : 'Dhikr',
           ),
           BottomNavigationBarItem(
             icon: const Icon(Icons.checklist_outlined),

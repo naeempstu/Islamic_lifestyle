@@ -34,7 +34,7 @@ class MessageBubble extends StatelessWidget {
                 color: isUserMessage
                     ? theme.primaryColor
                     : theme.brightness == Brightness.dark
-                        ? Colors.grey[800]
+                        ? const Color(0xFF374151)
                         : Colors.grey[200],
                 borderRadius: BorderRadius.circular(20).copyWith(
                   bottomRight: isUserMessage

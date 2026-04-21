@@ -84,8 +84,9 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
         FutureBuilder<PrayerTimesModel>(
           future: _timesFuture,
           builder: (context, snapshot) {
-            if (!snapshot.hasData)
+            if (!snapshot.hasData) {
               return const Center(child: CircularProgressIndicator());
+            }
             final times = snapshot.data!;
             return _PrayerTimesCard(
               language: widget.language,
